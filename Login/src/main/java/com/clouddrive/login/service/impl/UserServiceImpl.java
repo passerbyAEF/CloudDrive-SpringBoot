@@ -22,4 +22,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserMode> implement
         UserMode user = userMapper.selectOne(new QueryWrapper<UserMode>().eq("email", s));
         return user;
     }
+
+    @Override
+    public Boolean register(UserMode user) {
+        return userMapper.insert(user) == 1;
+    }
 }

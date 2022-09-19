@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 
 @ResponseBody
 @Controller
@@ -46,17 +44,13 @@ public class LoginController extends BaseController {
 //            response.sendRedirect("/login?meg=usernull");
             return Error("用户不存在！");
         }
+        Pwd = DigestUtils.md5DigestAsHex((Pwd).getBytes());
         if (!userMode.getPassword().equals(Pwd)) {
 //            response.sendRedirect("/login?meg=uperror");
             return Error("用户名或密码错误！");
         }
-        //登录数据合法性得到验证，派发Token
-        String hashStr = DigestUtils.md5DigestAsHex((Email + ":" + new Date()).getBytes());
-        redisUtil.addAndSetTimeOut(hashStr, objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userMode));
-        Cookie cookie = new Cookie("Token", hashStr);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        setToken(userMode, response);
         response.sendRedirect("/");
-        return OK(hashStr);
+        return OK("登录成功");
     }
 }

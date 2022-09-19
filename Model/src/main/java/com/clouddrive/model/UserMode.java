@@ -17,9 +17,8 @@ import java.util.List;
 @Data
 @TableName("user_table")
 public class UserMode implements UserDetails {
-    @TableId(value = "ID", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     Integer id;
-    @TableField("name")
     String name;
     @TableField("password")
     String pwd;
@@ -28,13 +27,12 @@ public class UserMode implements UserDetails {
     Date createTime;
     Date updateTime;
     Date deleteTime;
-    @TableField("auth")
-    String authorities;
+    String auth;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (authorities == null) return new ArrayList<>();
-        String[] authStr = authorities.split(";");
+        if (auth == null) return new ArrayList<>();
+        String[] authStr = auth.split(";");
         List<GrantedAuthority> li = new ArrayList<>();
         for (String s : authStr) {
             li.add(new SimpleGrantedAuthority(s));
@@ -48,7 +46,7 @@ public class UserMode implements UserDetails {
             stringBuilder.append(g.getAuthority());
             stringBuilder.append(';');
         }
-        authorities = stringBuilder.toString();
+        auth = stringBuilder.toString();
     }
 
     @Override

@@ -53,6 +53,10 @@ public class RegisterController extends BaseController {
         UserMode user = new UserMode();
         user.setName(Name);
         user.setEmail(Email);
+
+        //MD5
+        Pwd = DigestUtils.md5DigestAsHex((Pwd).getBytes());
+
         user.setPwd(Pwd);
         user.setCreateTime(new Date());
         user.setIsEnable(true);
@@ -60,12 +64,10 @@ public class RegisterController extends BaseController {
         li.add(new SimpleGrantedAuthority("ROLE_USER"));
         user.setAuthorities(li);
 
-        String hashStr = DigestUtils.md5DigestAsHex((Email + ":" + new Date()).getBytes());
-        redisUtil.addAndSetTimeOut(hashStr, objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(user));
-        Cookie cookie = new Cookie("Token", hashStr);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        if(!userService.register(user)) return Error("500");
+
+        setToken(user, response);
         response.sendRedirect("/");
-        return OK(hashStr);
+        return OK("注册成功");
     }
 }
