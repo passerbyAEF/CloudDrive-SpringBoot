@@ -39,34 +39,30 @@ public class RegisterController extends BaseController {
     ObjectMapper objectMapper;
 
     @PostMapping("register")
-    ReturnMode<Object> Register(HttpServletResponse response, @RequestParam String Name, @RequestParam String Email, @RequestParam String Pwd) throws IOException {
+    ReturnMode<Object> Register(HttpServletResponse response, @RequestParam String name, @RequestParam String email, @RequestParam String pwd) throws IOException {
         //检查登录数据合法性
-        if (StringUtils.isEmpty(Name) || StringUtils.isEmpty(Email) || StringUtils.isEmpty(Pwd)) {
+        if (StringUtils.isEmpty(name) || StringUtils.isEmpty(email) || StringUtils.isEmpty(pwd)) {
 //            response.sendRedirect("/login?meg=null");
             return Error("用户名或密码为空！");
         }
-        if (userService.getOne(new QueryWrapper<UserMode>().eq("email", Email)) != null) {
+        if (userService.getOne(new QueryWrapper<UserMode>().eq("email", email)) != null) {
 //            response.sendRedirect("/login?meg=usernull");
             return Error("用户已被注册！");
         }
 
         UserMode user = new UserMode();
-        user.setName(Name);
-        user.setEmail(Email);
-
+        user.setName(name);
+        user.setEmail(email);
         //MD5
-        Pwd = DigestUtils.md5DigestAsHex((Pwd).getBytes());
-
-        user.setPwd(Pwd);
+        pwd = DigestUtils.md5DigestAsHex((pwd).getBytes());
+        user.setPwd(pwd);
         user.setCreateTime(new Date());
         user.setIsEnable(true);
         List<GrantedAuthority> li = new ArrayList<>();
         li.add(new SimpleGrantedAuthority("ROLE_USER"));
         user.setAuthorities(li);
-
-        if(!userService.register(user)) return Error("500");
-
-        setToken(user, response);
+        if (!userService.register(user)) return Error("500");
+        setToken(user, response, true);
         response.sendRedirect("/");
         return OK("注册成功");
     }

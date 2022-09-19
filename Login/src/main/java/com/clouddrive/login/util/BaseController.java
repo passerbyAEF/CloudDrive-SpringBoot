@@ -30,11 +30,12 @@ public class BaseController {
         return (UserMode) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    protected void setToken(UserMode user, HttpServletResponse response) throws IOException {
+    protected void setToken(UserMode user, HttpServletResponse response, boolean remember) throws IOException {
         String hashStr = DigestUtils.md5DigestAsHex((user.getEmail() + ":" + new Date()).getBytes());
         redisUtil.addAndSetTimeOut(hashStr, objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(user));
         Cookie cookie = new Cookie("Token", hashStr);
         cookie.setPath("/");
+        if (remember) cookie.setMaxAge(2592000);
         response.addCookie(cookie);
     }
 }
