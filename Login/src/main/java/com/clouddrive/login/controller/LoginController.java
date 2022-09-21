@@ -33,13 +33,13 @@ public class LoginController extends BaseController {
     ObjectMapper objectMapper;
 
     @PostMapping("login")
-    ReturnMode<Object> Login(HttpServletResponse response, @RequestParam String email, @RequestParam String pwd,@RequestParam(defaultValue = "0") Boolean remember) throws IOException {
+    ReturnMode<Object> Login(HttpServletResponse response, @RequestParam String email, @RequestParam String pwd, @RequestParam(defaultValue = "0") Boolean remember) throws IOException {
         //检查登录数据合法性
         if (StringUtils.isEmpty(email) || StringUtils.isEmpty(pwd)) {
 //            response.sendRedirect("/login?meg=null");
             return Error("用户名或密码为空！");
         }
-        UserMode userMode = (UserMode) userService.loadUserByUsername(email);
+        UserMode userMode = userService.getUserByEmail(email);
         if (userMode == null) {
 //            response.sendRedirect("/login?meg=usernull");
             return Error("用户不存在！");
@@ -49,7 +49,7 @@ public class LoginController extends BaseController {
 //            response.sendRedirect("/login?meg=uperror");
             return Error("用户名或密码错误！");
         }
-        setToken(userMode, response,remember);
+        setToken(userMode, response, remember);
         response.sendRedirect("/");
         return OK("登录成功");
     }

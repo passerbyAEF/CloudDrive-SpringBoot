@@ -28,6 +28,7 @@ public class UserMode implements UserDetails {
     Date updateTime;
     Date deleteTime;
     String auth;
+    Long storage;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
