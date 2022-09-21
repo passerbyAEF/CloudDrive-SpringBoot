@@ -1,12 +1,11 @@
 package com.clouddrive.login.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.clouddrive.login.service.UserService;
 import com.clouddrive.login.service.impl.UserServiceImpl;
 import com.clouddrive.login.util.BaseController;
 import com.clouddrive.login.util.RedisUtil;
 import com.clouddrive.login.util.ReturnMode;
-import com.clouddrive.model.UserMode;
+import com.clouddrive.model.data.UserMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;

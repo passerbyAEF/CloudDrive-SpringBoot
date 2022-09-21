@@ -1,4 +1,4 @@
-package com.clouddrive.login.util;
+package com.clouddrive.main.util;
 
 import com.clouddrive.model.data.UserMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +24,10 @@ public class BaseController {
 
     protected ReturnMode<Object> OK(Object data) {
         return new ReturnMode<>(data, "OK");
+    }
+
+    protected ReturnMode<Object> OK() {
+        return new ReturnMode<>(null, "OK");
     }
 
     protected UserMode getUser() {

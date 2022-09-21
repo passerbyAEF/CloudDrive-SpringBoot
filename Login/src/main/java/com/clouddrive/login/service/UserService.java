@@ -1,6 +1,6 @@
 package com.clouddrive.login.service;
 
-import com.clouddrive.model.UserMode;
+import com.clouddrive.model.data.UserMode;
 
 public interface UserService {
 

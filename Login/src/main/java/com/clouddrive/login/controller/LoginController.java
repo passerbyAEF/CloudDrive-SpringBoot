@@ -1,7 +1,7 @@
 package com.clouddrive.login.controller;
 
 import com.clouddrive.login.util.RedisUtil;
-import com.clouddrive.model.UserMode;
+import com.clouddrive.model.data.UserMode;
 import com.clouddrive.login.service.impl.UserServiceImpl;
 import com.clouddrive.login.util.BaseController;
 import com.clouddrive.login.util.ReturnMode;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,7 +19,6 @@ import java.io.IOException;
 
 @ResponseBody
 @Controller
-@RequestMapping("api")
 public class LoginController extends BaseController {
 
     @Autowired

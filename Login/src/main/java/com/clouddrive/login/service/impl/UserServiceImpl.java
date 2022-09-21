@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.clouddrive.login.mapper.UserMapper;
 import com.clouddrive.login.service.UserService;
-import com.clouddrive.model.UserMode;
+import com.clouddrive.model.data.UserMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

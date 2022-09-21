@@ -1,4 +1,4 @@
-package com.clouddrive.model;
+package com.clouddrive.model.data;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
