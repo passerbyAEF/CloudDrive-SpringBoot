@@ -1,10 +1,10 @@
 package com.clouddrive.login.controller;
 
-import com.clouddrive.login.util.RedisUtil;
-import com.clouddrive.model.data.UserMode;
 import com.clouddrive.login.service.impl.UserServiceImpl;
-import com.clouddrive.login.util.BaseController;
-import com.clouddrive.login.util.ReturnMode;
+import com.clouddrive.model.data.UserMode;
+import com.clouddrive.util.BaseController;
+import com.clouddrive.util.RedisUtil;
+import com.clouddrive.util.ReturnMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

@@ -1,12 +1,12 @@
-package com.clouddrive.main.filter;
+package com.clouddrive.file.filter;
 
 import com.clouddrive.model.data.UserMode;
+import com.clouddrive.util.RedisUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.clouddrive.util.RedisUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

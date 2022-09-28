@@ -1,4 +1,4 @@
-package com.clouddrive.main.util;
+package com.clouddrive.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

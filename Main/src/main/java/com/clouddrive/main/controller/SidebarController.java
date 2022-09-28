@@ -1,7 +1,7 @@
 package com.clouddrive.main.controller;
 
-import com.clouddrive.main.util.BaseController;
-import com.clouddrive.main.util.ReturnMode;
+import com.clouddrive.util.BaseController;
+import com.clouddrive.util.ReturnMode;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

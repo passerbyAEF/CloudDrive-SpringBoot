@@ -8,6 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>Model</module>
+        <module>Util</module>
     </modules>
     <name>CloudDrive-SpringBoot</name>
     <description>CloudDrive-SpringBoot</description>
