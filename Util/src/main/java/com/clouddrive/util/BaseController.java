@@ -10,6 +10,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class BaseController {
 
@@ -36,7 +37,7 @@ public class BaseController {
 
     protected void setToken(UserMode user, HttpServletResponse response, boolean remember) throws IOException {
         String hashStr = DigestUtils.md5DigestAsHex((user.getEmail() + ":" + new Date()).getBytes());
-        redisUtil.addAndSetTimeOut(hashStr, objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(user));
+        redisUtil.addStringAndSetTimeOut(hashStr, objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(user), 30, TimeUnit.DAYS);
         Cookie cookie = new Cookie("Token", hashStr);
         cookie.setPath("/");
         if (remember) cookie.setMaxAge(2592000);

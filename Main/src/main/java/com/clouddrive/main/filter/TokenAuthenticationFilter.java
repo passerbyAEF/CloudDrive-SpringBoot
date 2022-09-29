@@ -31,7 +31,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
         if (token != null) {
             //如果有Token
-            String str = redisUtil.get(token);
+            String str = redisUtil.getString(token);
             if (str != null) {
                 //如果Redis中存放着Token，就提取出缓存在Redis中的用户信息
                 UserMode user = objectMapper.readValue(str, UserMode.class);
