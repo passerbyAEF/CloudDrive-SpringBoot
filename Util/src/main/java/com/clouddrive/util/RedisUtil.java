@@ -43,7 +43,7 @@ public class RedisUtil {
 
     public String getString(String key) {
         try {
-            return Objects.requireNonNull(redisTemplate.opsForValue().get(key)).toString();
+            return redisTemplate.opsForValue().get(key).toString();
         } catch (Exception e) {
             return null;
         }

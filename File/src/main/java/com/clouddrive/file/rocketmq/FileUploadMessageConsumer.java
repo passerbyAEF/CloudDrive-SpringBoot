@@ -45,9 +45,9 @@ public class FileUploadMessageConsumer implements RocketMQListener<String> {
         String hash = map.get("hash").toString();
         String size = map.get("size").toString();
 
-        if (!new File(fileSavePath).exists()) {
-            throw new FileNotFoundException(fileSavePath + "不存在！");
-        }
+//        if (!new File(fileSavePath).exists()) {
+//            throw new FileNotFoundException(fileSavePath + "不存在！");
+//        }
 
         //创建一个空文件占位
         RandomAccessFile file = new RandomAccessFile(fileBufferPath + "/" + "hash", "rw");
@@ -62,12 +62,15 @@ public class FileUploadMessageConsumer implements RocketMQListener<String> {
         rocketMQTemplate.asyncSend("file:uploadReturn", uploadId, new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
+                log.info("已记录Upload");
                 log.info(uploadId + "已发送");
             }
 
+            @SneakyThrows
             @Override
             public void onException(Throwable throwable) {
                 log.info(uploadId + "发送失败，重新发送");
+                Thread.sleep(1000);
                 rocketMQTemplate.asyncSend("file:uploadReturn", uploadId, this);
             }
         });

@@ -94,7 +94,7 @@ public class UploadServiceImpl implements UploadService {
                 }
                 fileId++;
             }
-            File saveFile = new File(fileSaveFolder.getCanonicalPath() + hashStr + ":" + fileId);
+            File saveFile = new File(fileSaveFolder.getCanonicalPath() + "\\" + hashStr + ":" + fileId);
             if (!bufferFile.renameTo(saveFile)) {
                 return FileUploadState.ERROR;
             }
