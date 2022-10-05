@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -100,11 +101,18 @@ public class UploadServiceImpl implements UploadService {
             }
 
             redisUtil.removeString(uploadId);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("hash", hashStr);
+            data.put("size", sizeStr);
+            data.put("fileId", fileId);
+            String jsonStr = objectMapper.writeValueAsString(data);
+
             //将当前文件路径记录发送回主程序
-            rocketMQTemplate.asyncSend("file:uploadOK", hashStr + ":" + fileId, new SendCallback() {
+            rocketMQTemplate.asyncSend("file:uploadOK", objectMapper.writeValueAsString(data), new SendCallback() {
                 @Override
                 public void onSuccess(SendResult var1) {
-                    log.info("file:uploadOK:" + hashStr + "发送成功");
+                    log.info("file:uploadOK:" + jsonStr + "发送成功");
                 }
 
                 @SneakyThrows
@@ -112,7 +120,7 @@ public class UploadServiceImpl implements UploadService {
                 public void onException(Throwable var1) {
                     //RocketMQ发送失败了（可能是挂了），重复发送
                     Thread.sleep(1000);
-                    rocketMQTemplate.asyncSend("file:uploadOK", hashStr, this);
+                    rocketMQTemplate.asyncSend("file:uploadOK", jsonStr, this);
                 }
             });
             return FileUploadState.OK;

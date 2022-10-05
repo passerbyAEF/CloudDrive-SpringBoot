@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -50,16 +52,28 @@ public class FileUploadMessageConsumer implements RocketMQListener<String> {
 //        }
 
         //创建一个空文件占位
-        RandomAccessFile file = new RandomAccessFile(fileBufferPath + "/" + "hash", "rw");
-        file.setLength(Long.getLong(size));
+        RandomAccessFile file = new RandomAccessFile(fileBufferPath + "/" + hash, "rw");
+        //file.setLength(Long.getLong(size));
+        file.setLength(1);
         file.close();
 
-        //获取id并保存入Redis中，wrote记录当前已写入的字节范围
         String uploadId = UUID.randomUUID().toString();
-        String mess = String.format("{\"hash\":\"%s\",\"size\":\"%s\",\"wrote\":[]}", hash, size);
-        redisUtil.addStringAndSetTimeOut(uploadId, mess, 5);
+        Map<String, String> reMap = new HashMap<>();
+        reMap.put("hash", hash);
+        reMap.put("size", size);
+        reMap.put("uploadId", uploadId);
+        String reJsonStr = objectMapper.writeValueAsString(reMap);
 
-        rocketMQTemplate.asyncSend("file:uploadReturn", uploadId, new SendCallback() {
+        //获取id并保存入Redis中，wrote记录当前已写入的字节范围
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("hash", hash);
+        dataMap.put("size", size);
+        dataMap.put("wrote", new ArrayList<String>());
+        String dataJsonStr = objectMapper.writeValueAsString(dataMap);
+//        String mess = String.format("{\"hash\":\"%s\",\"size\":\"%s\",\"wrote\":[]}", hash, size);
+        redisUtil.addStringAndSetTimeOut(uploadId, dataJsonStr, 5);
+
+        rocketMQTemplate.asyncSend("file:uploadReturn", reJsonStr, new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
                 log.info("已记录Upload");

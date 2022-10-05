@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +31,7 @@ public class UserMode implements UserDetails {
     String auth;
     Long storage;
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (auth == null) return new ArrayList<>();
@@ -41,6 +43,7 @@ public class UserMode implements UserDetails {
         return li;
     }
 
+    @JsonIgnore
     public void setAuthorities(List<? extends GrantedAuthority> authList) {
         StringBuilder stringBuilder = new StringBuilder();
         for (GrantedAuthority g : authList) {

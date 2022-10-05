@@ -14,7 +14,8 @@ public class FileMode {
     int id;
     String name;
     int folderId;
-    int hashId;
+    String hashId;
+    int userId;
     long storage;
     Date createTime;
     Date updateTime;

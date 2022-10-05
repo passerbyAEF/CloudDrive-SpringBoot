@@ -5,8 +5,7 @@ import com.clouddrive.model.view.FileViewNode;
 
 import java.util.List;
 
+//文件列表搜素
 public interface FileListService {
     List<FileViewNode> getList(UserMode user,int folderId);
-    void Upload(UserMode user,int folderId);
-    void Download(UserMode user,int fileId);
 }

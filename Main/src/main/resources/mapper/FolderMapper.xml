@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clouddrive.main.mapper.FolderMapper">
+    <resultMap id="folderMode" type="com.clouddrive.model.data.FolderMode">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="deleteTime" column="delete_time"/>
+    </resultMap>
+    <select id="findFolderByParentIdAndUserId" resultMap="folderMode">
+        select *
+        from folder_table
+        where parent_id = #{arg1};
+    </select>
+</mapper>
