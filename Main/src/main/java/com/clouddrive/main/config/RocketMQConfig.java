@@ -15,28 +15,28 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RocketMQConfig {
 
-    @Bean(name = "updateTemplate")
-    public RocketMQTemplate updateTemplate(RocketMQMessageConverter rocketMQMessageConverter, RocketMQProperties rocketMQProperties) throws MQClientException {
-        RocketMQTemplate rocketMQTemplate = new RocketMQTemplate();
-        RocketMQProperties.Consumer consumerConfig = rocketMQProperties.getConsumer();
-        String nameServer = rocketMQProperties.getNameServer();
-        String groupName = consumerConfig.getGroup();
-        String topicName = "file";
-        String selectorExpression = "uploadReturn";
-        String accessChannel = rocketMQProperties.getAccessChannel();
-
-        MessageModel messageModel = MessageModel.valueOf(consumerConfig.getMessageModel());
-        SelectorType selectorType = SelectorType.valueOf(consumerConfig.getSelectorType());
-        int pullBatchSize = consumerConfig.getPullBatchSize();
-        boolean useTLS = consumerConfig.isTlsEnable();
-        DefaultLitePullConsumer litePullConsumer = RocketMQUtil.createDefaultLitePullConsumer(nameServer, accessChannel, groupName, topicName, messageModel, selectorType, selectorExpression, null, null, pullBatchSize, useTLS);
-        litePullConsumer.setEnableMsgTrace(consumerConfig.isEnableMsgTrace());
-        litePullConsumer.setCustomizedTraceTopic(consumerConfig.getCustomizedTraceTopic());
-        litePullConsumer.setNamespace(consumerConfig.getNamespace());
-        litePullConsumer.setAllocateMessageQueueStrategy(new AllocateMessageQueueAveragely());
-
-        rocketMQTemplate.setConsumer(litePullConsumer);
-        rocketMQTemplate.setMessageConverter(rocketMQMessageConverter.getMessageConverter());
-        return rocketMQTemplate;
-    }
+//    @Bean(name = "updateTemplate")
+//    public RocketMQTemplate updateTemplate(RocketMQMessageConverter rocketMQMessageConverter, RocketMQProperties rocketMQProperties) throws MQClientException {
+//        RocketMQTemplate rocketMQTemplate = new RocketMQTemplate();
+//        RocketMQProperties.Consumer consumerConfig = rocketMQProperties.getConsumer();
+//        String nameServer = rocketMQProperties.getNameServer();
+//        String groupName = consumerConfig.getGroup();
+//        String topicName = "file";
+//        String selectorExpression = "uploadReturn";
+//        String accessChannel = rocketMQProperties.getAccessChannel();
+//
+//        MessageModel messageModel = MessageModel.valueOf(consumerConfig.getMessageModel());
+//        SelectorType selectorType = SelectorType.valueOf(consumerConfig.getSelectorType());
+//        int pullBatchSize = consumerConfig.getPullBatchSize();
+//        boolean useTLS = consumerConfig.isTlsEnable();
+//        DefaultLitePullConsumer litePullConsumer = RocketMQUtil.createDefaultLitePullConsumer(nameServer, accessChannel, groupName, topicName, messageModel, selectorType, selectorExpression, null, null, pullBatchSize, useTLS);
+//        litePullConsumer.setEnableMsgTrace(consumerConfig.isEnableMsgTrace());
+//        litePullConsumer.setCustomizedTraceTopic(consumerConfig.getCustomizedTraceTopic());
+//        litePullConsumer.setNamespace(consumerConfig.getNamespace());
+//        litePullConsumer.setAllocateMessageQueueStrategy(new AllocateMessageQueueAveragely());
+//
+//        rocketMQTemplate.setConsumer(litePullConsumer);
+//        rocketMQTemplate.setMessageConverter(rocketMQMessageConverter.getMessageConverter());
+//        return rocketMQTemplate;
+//    }
 }

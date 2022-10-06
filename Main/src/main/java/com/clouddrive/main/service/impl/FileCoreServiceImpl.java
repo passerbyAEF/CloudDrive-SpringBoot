@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class FileCoreServiceImpl implements FileCoreService {
 
-    @Autowired
-    private RocketMQTemplate updateTemplate;
+//    @Autowired
+//    private RocketMQTemplate updateTemplate;
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
     @Autowired

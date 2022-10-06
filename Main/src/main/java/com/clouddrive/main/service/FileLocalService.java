@@ -7,17 +7,17 @@ public interface FileLocalService {
 
     boolean linkFileAndHash(Integer user, String name, Integer size, Integer folderId, String hashStr);
 
-    void MoveFile(UserMode user, int fileId, int toFolderId);
+    boolean MoveFile(UserMode user, int fileId, int toFolderId);
 
-    void DeleteFile(UserMode user, int fileId);
+    boolean DeleteFile(UserMode user, int fileId);
 
-    void RenameFile(UserMode user, int fileId, String name);
+    boolean RenameFile(UserMode user, int fileId, String name);
 
-    void CreateFolder(UserMode user, String name, int inFolderId);
+    boolean CreateFolder(UserMode user, String name, int inFolderId);
 
-    void MoveFolder(UserMode user, int folderId, int toFolderId);
+    boolean MoveFolder(UserMode user, int folderId, int toFolderId);
 
-    void DeleteFolder(UserMode user, int fileId);
+    boolean DeleteFolder(UserMode user, int folderId);
 
-    void RenameFolder(UserMode user, int fileId, String name);
+    boolean RenameFolder(UserMode user, int folderId, String name);
 }

@@ -27,10 +27,12 @@ public class FileListServiceImpl implements FileListService {
         List<FolderMode> folderList = folderMapper.findFolderByParentIdAndUserId(user.getId(), folderId);
         List<FileViewNode> viewList = new ArrayList<>();
         for (FolderMode item : folderList) {
-            viewList.add(new FileViewNode(item));
+            if (item.getDeleteTime() != null)
+                viewList.add(new FileViewNode(item));
         }
         for (FileMode item : fileList) {
-            viewList.add(new FileViewNode(item));
+            if (item.getDeleteTime() != null)
+                viewList.add(new FileViewNode(item));
         }
         return viewList;
     }
