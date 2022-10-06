@@ -1,6 +1,8 @@
 package com.clouddrive.main.service.impl;
 
+import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.service.FileCoreService;
+import com.clouddrive.model.data.FileMode;
 import com.clouddrive.model.data.UserMode;
 import com.clouddrive.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +14,7 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +29,8 @@ public class FileCoreServiceImpl implements FileCoreService {
     private RocketMQTemplate rocketMQTemplate;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private FileMapper fileMapper;
 
     @Autowired
     private RedisUtil redisUtil;
@@ -56,23 +61,52 @@ public class FileCoreServiceImpl implements FileCoreService {
         map.put("name", name);
         map.put("folderId", folderId);
         map.put("user", user.getId());
-        redisUtil.addStringAndSetTimeOut("uploadData:" + map.get("hash") + ":" + size, objectMapper.writeValueAsString(map), 24, TimeUnit.HOURS);
+        redisUtil.addStringAndSetTimeOut("uploadData:" + hash + ":" + size, objectMapper.writeValueAsString(map), 24, TimeUnit.HOURS);
 
-        return hash;
+        return hash + ":" + size;
     }
 
     @Override
-    public String getUploadFlag(String hash, Long size) {
-        String reStr = redisUtil.getString("uploadReturn:" + hash + ":" + size);
-        if (reStr != null) {
-            redisUtil.removeString("uploadReturn:" + hash + ":" + size);
+    public String getUploadFlag(String flag) {
+        String reStr = redisUtil.getString("uploadReturn:" + flag);
+        if (reStr == null) {
+            return "wait";
         }
+        redisUtil.removeString("uploadReturn:" + flag);
         return reStr;
     }
 
 
     @Override
-    public String Download(UserMode user, int fileId) {
-        return null;
+    public String Download(UserMode user, int fileId) throws IOException {
+        FileMode fileMode = fileMapper.selectById(fileId);
+        if (fileMode == null || fileMode.getUserId() != user.getId())
+            throw new IOException("文件不存在");
+        String flag = fileMode.getHashId().split(":")[0] + fileMode.getStorage();
+        Map<String, String> data = new HashMap<>();
+        data.put("hash", fileMode.getHashId());
+        rocketMQTemplate.asyncSend("file:download", objectMapper.writeValueAsString(data), new SendCallback() {
+            @Override
+            public void onSuccess(SendResult sendResult) {
+
+            }
+
+            @Override
+            public void onException(Throwable throwable) {
+                //发送失败，不重复发送了，直接放弃
+                redisUtil.addStringAndSetTimeOut("downloadReturn:" + flag, "error", 5);
+            }
+        });
+        return flag;
+    }
+
+    @Override
+    public String getDownloadFlag(String flag) {
+        String reStr = redisUtil.getString("downloadReturn:" + flag);
+        if (reStr == null) {
+            return "wait";
+        }
+        redisUtil.removeString("downloadReturn:" + flag);
+        return reStr;
     }
 }

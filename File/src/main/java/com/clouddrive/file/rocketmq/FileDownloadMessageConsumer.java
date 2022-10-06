@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,9 +46,12 @@ public class FileDownloadMessageConsumer implements RocketMQListener<String> {
         String downloadId = UUID.randomUUID().toString();
         String mess = String.format("{\"hash\":\"%s\",\"FileId\":\"%s\",\"size\":\"%s\"}", hash, fileId, file.length());
 
-        redisUtil.addStringAndSetTimeOut(downloadId, mess, 5);
+        redisUtil.addStringAndSetTimeOut("downloadTask:" + downloadId, mess, 5);
 
-        rocketMQTemplate.asyncSend("file:downloadReturn", downloadId, new SendCallback() {
+        Map<String, String> re = new HashMap<>();
+        re.put("hashId", map.get("hash").toString());
+        re.put("downloadId", downloadId);
+        rocketMQTemplate.asyncSend("file:downloadReturn", objectMapper.writeValueAsString(re), new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
                 log.info("已记录Download");
@@ -59,7 +63,7 @@ public class FileDownloadMessageConsumer implements RocketMQListener<String> {
             public void onException(Throwable throwable) {
                 log.info(downloadId + "发送失败，重新发送");
                 Thread.sleep(1000);
-                rocketMQTemplate.asyncSend("file:uploadReturn", downloadId, this);
+                rocketMQTemplate.asyncSend("file:downloadReturn", downloadId, this);
             }
         });
     }

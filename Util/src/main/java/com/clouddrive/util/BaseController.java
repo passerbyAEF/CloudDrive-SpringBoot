@@ -19,6 +19,10 @@ public class BaseController {
     @Autowired
     ObjectMapper objectMapper;
 
+    protected ReturnMode<Object> Error() {
+        return new ReturnMode<>(null, "Error");
+    }
+
     protected ReturnMode<Object> Error(String message) {
         return new ReturnMode<>(message, "Error");
     }

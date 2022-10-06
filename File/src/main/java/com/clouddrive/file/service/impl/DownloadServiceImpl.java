@@ -27,7 +27,7 @@ public class DownloadServiceImpl implements DownloadService {
 
     @Override
     public FileInputStream DownloadFile(String downloadId) throws IOException {
-        String jsonStr = redisUtil.getString(downloadId);
+        String jsonStr = redisUtil.getString("downloadTask:" +downloadId);
         if (jsonStr == null)
             return null;
         Map<String, Object> map = objectMapper.readValue(jsonStr, new TypeReference<Map>() {
