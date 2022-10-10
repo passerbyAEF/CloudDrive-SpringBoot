@@ -11,12 +11,12 @@ import java.util.Date;
 @TableName("file_table")
 public class FileMode {
     @TableId(type = IdType.AUTO)
-    int id;
+    Integer id;
     String name;
-    int folderId;
+    Integer folderId;
     String hashId;
-    int userId;
-    long storage;
+    Integer userId;
+    Long storage;
     Date createTime;
     Date updateTime;
     Date deleteTime;

@@ -12,10 +12,10 @@ import java.util.Date;
 @TableName("folder_table")
 public class FolderMode {
     @TableId(type = IdType.AUTO)
-    int id;
+    Integer id;
     String name;
-    int ownerId;
-    int parentId;
+    Integer ownerId;
+    Integer parentId;
     Date createTime;
     Date updateTime;
     Date deleteTime;
