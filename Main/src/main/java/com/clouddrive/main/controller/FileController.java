@@ -3,6 +3,8 @@ package com.clouddrive.main.controller;
 import com.clouddrive.main.service.FileCoreService;
 import com.clouddrive.main.service.FileListService;
 import com.clouddrive.main.service.FileLocalService;
+import com.clouddrive.model.data.UserMode;
+import com.clouddrive.model.dto.CreateFolderDTO;
 import com.clouddrive.model.dto.RenameFileDTO;
 import com.clouddrive.model.dto.RenameFolderDTO;
 import com.clouddrive.model.dto.UploadDTO;
@@ -20,6 +22,7 @@ import java.util.Map;
 @Controller
 @ResponseBody
 @RequestMapping("File")
+@CrossOrigin
 public class FileController extends BaseController {
 
     @Autowired
@@ -31,9 +34,14 @@ public class FileController extends BaseController {
 
     @GetMapping("List")
     ReturnMode<Object> List(HttpServletResponse response, @RequestParam Integer folderId) {
-        if (folderId == null)
-            return Error("参数错误");
+        UserMode user = getUser();
         return OK(fileListService.getList(getUser(), folderId));
+    }
+
+    @GetMapping("GetRoot")
+    ReturnMode<Object> GetRoot(HttpServletResponse response) {
+        UserMode user = getUser();
+        return OK(fileListService.getRoot(getUser()).getId());
     }
 
     @PostMapping("Upload")
@@ -93,6 +101,14 @@ public class FileController extends BaseController {
     @PostMapping("RenameFile")
     ReturnMode<Object> RenameFile(HttpServletResponse response, @RequestBody @Valid RenameFileDTO data) {
         if (!fileLocalService.RenameFile(getUser(), data.getFileId(), data.getName())) {
+            return Error();
+        }
+        return OK();
+    }
+
+    @PostMapping("CreateFolder")
+    ReturnMode<Object> CreateFolder(HttpServletResponse response, @RequestBody @Valid CreateFolderDTO folderDTO) {
+        if (!fileLocalService.CreateFolder(getUser(), folderDTO.getName(), folderDTO.getParentId())) {
             return Error();
         }
         return OK();

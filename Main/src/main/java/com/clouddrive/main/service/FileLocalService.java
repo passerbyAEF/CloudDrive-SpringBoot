@@ -5,7 +5,7 @@ import com.clouddrive.model.data.UserMode;
 //主要承接不需要与文件中心交换数据的，只涉及到本地数据库修改的操作
 public interface FileLocalService {
 
-    boolean linkFileAndHash(Integer user, String name, Integer size, Integer folderId, String hashStr);
+    boolean linkFileAndHash(Integer user, String name, Long size, Integer folderId, String hashStr);
 
     boolean MoveFile(UserMode user, int fileId, int toFolderId);
 

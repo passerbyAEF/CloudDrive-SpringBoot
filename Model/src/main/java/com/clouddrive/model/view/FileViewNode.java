@@ -2,6 +2,7 @@ package com.clouddrive.model.view;
 
 import com.clouddrive.model.data.FileMode;
 import com.clouddrive.model.data.FolderMode;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -33,5 +34,6 @@ public class FileViewNode {
     //大小，若是文件夹则为0
     long storage;
     //更新时间
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     Date time;
 }

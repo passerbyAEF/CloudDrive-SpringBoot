@@ -34,7 +34,7 @@ public class UploadOKMessageConsumer implements RocketMQListener<String> {
         });
         String hash = map.get("hash").toString();
         String fileId = map.get("hash").toString();
-        Integer size = Integer.valueOf(map.get("size").toString());
+        Long size = Long.valueOf(map.get("size").toString());
 
         //读取之前保存在Redis里面的文件相关数据
         String fileLocalData = redisUtil.getString("uploadData:" + hash + ":" + size);

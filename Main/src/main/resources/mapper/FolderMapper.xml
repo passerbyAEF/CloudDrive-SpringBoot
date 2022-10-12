@@ -17,4 +17,10 @@
         from folder_table
         where parent_id = #{arg1};
     </select>
+    <select id="findRootFolderId" resultMap="folderMode">
+        select *
+        from folder_table
+        where owner_id = #{arg1} and parent_id is NULL
+        limit 1;
+    </select>
 </mapper>

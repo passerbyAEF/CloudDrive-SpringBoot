@@ -1,5 +1,6 @@
 package com.clouddrive.main.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
 import com.clouddrive.main.service.FileLocalService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class FileLocalServiceImpl implements FileLocalService {
@@ -21,7 +23,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     FolderMapper folderMapper;
 
     @Override
-    public boolean linkFileAndHash(Integer user, String name, Integer size, Integer folderId, String hashStr) {
+    public boolean linkFileAndHash(Integer user, String name, Long size, Integer folderId, String hashStr) {
         if (user == null || StringUtils.isEmpty(name) || size == null || folderId == null || StringUtils.isEmpty(hashStr)) {
             return false;
         }
@@ -41,7 +43,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     public boolean MoveFile(UserMode user, int fileId, int toFolderId) {
         FileMode file = fileMapper.selectById(fileId);
         FolderMode toFolder = folderMapper.selectById(toFolderId);
-        if (file == null || toFolder == null || file.getUserId() != user.getId() || toFolder.getOwnerId() != user.getId()) {
+        if (file == null || toFolder == null || file.getUserId().equals(user.getId()) || toFolder.getOwnerId().equals(user.getId())) {
             return false;
         }
         file.setUpdateTime(new Date());
@@ -52,7 +54,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     @Override
     public boolean DeleteFile(UserMode user, int fileId) {
         FileMode file = fileMapper.selectById(fileId);
-        if (file == null || file.getUserId() != user.getId()) {
+        if (file == null || file.getUserId().equals(user.getId())) {
             return false;
         }
         file.setUpdateTime(new Date());
@@ -63,7 +65,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     @Override
     public boolean RenameFile(UserMode user, int fileId, String name) {
         FileMode file = fileMapper.selectById(fileId);
-        if (file == null || file.getUserId() != user.getId()) {
+        if (file == null || file.getUserId().equals(user.getId())) {
             return false;
         }
         file.setUpdateTime(new Date());
@@ -90,7 +92,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     public boolean MoveFolder(UserMode user, int folderId, int toFolderId) {
         FolderMode folder = folderMapper.selectById(folderId);
         FolderMode toFolder = folderMapper.selectById(toFolderId);
-        if (folder == null || toFolder == null || folder.getOwnerId() != user.getId() || toFolder.getOwnerId() != user.getId()) {
+        if (folder == null || toFolder == null || folder.getOwnerId().equals(user.getId()) || toFolder.getOwnerId().equals(user.getId())) {
             return false;
         }
         folder.setParentId(toFolderId);
@@ -101,8 +103,16 @@ public class FileLocalServiceImpl implements FileLocalService {
     @Override
     public boolean DeleteFolder(UserMode user, int folderId) {
         FolderMode folder = folderMapper.selectById(folderId);
-        if (folder == null || folder.getOwnerId() != user.getId()) {
+        if (folder == null || folder.getOwnerId().equals(user.getId())) {
             return false;
+        }
+        List<FolderMode> folderList = folderMapper.findFolderByParentIdAndUserId(user.getId(), folderId);
+        List<FileMode> fileList = fileMapper.findFileByFolderIdAndUserId(user.getId(), folderId);
+        for (FolderMode item : folderList) {
+            DeleteFolder(user, item.getId());
+        }
+        for (FileMode item : fileList) {
+            DeleteFile(user, item.getId());
         }
         Date now = new Date();
         folder.setUpdateTime(now);
@@ -113,7 +123,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     @Override
     public boolean RenameFolder(UserMode user, int folderId, String name) {
         FolderMode folder = folderMapper.selectById(folderId);
-        if (folder == null || folder.getOwnerId() != user.getId()) {
+        if (folder == null || folder.getOwnerId().equals(user.getId())) {
             return false;
         }
         folder.setName(name);

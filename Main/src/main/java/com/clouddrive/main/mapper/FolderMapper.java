@@ -9,4 +9,6 @@ import java.util.List;
 @Mapper
 public interface FolderMapper extends BaseMapper<FolderMode> {
     List<FolderMode> findFolderByParentIdAndUserId(int userId, int folderId);
+
+    FolderMode findRootFolderId(int userId);
 }

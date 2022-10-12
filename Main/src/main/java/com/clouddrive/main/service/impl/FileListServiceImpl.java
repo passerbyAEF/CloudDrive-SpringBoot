@@ -1,5 +1,6 @@
 package com.clouddrive.main.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
 import com.clouddrive.main.service.FileListService;
@@ -27,13 +28,19 @@ public class FileListServiceImpl implements FileListService {
         List<FolderMode> folderList = folderMapper.findFolderByParentIdAndUserId(user.getId(), folderId);
         List<FileViewNode> viewList = new ArrayList<>();
         for (FolderMode item : folderList) {
-            if (item.getDeleteTime() != null)
+            //非null代表没有进行删除
+            if (item.getDeleteTime() == null)
                 viewList.add(new FileViewNode(item));
         }
         for (FileMode item : fileList) {
-            if (item.getDeleteTime() != null)
+            if (item.getDeleteTime() == null)
                 viewList.add(new FileViewNode(item));
         }
         return viewList;
+    }
+
+    @Override
+    public FolderMode getRoot(UserMode user) {
+        return folderMapper.findRootFolderId(user.getId());
     }
 }
