@@ -26,7 +26,6 @@ import java.util.List;
 
 @ResponseBody
 @Controller
-@RequestMapping("api")
 public class RegisterController extends BaseController {
 
     @Autowired
@@ -61,7 +60,7 @@ public class RegisterController extends BaseController {
         user.setAuthorities(li);
         if (!userService.register(user)) return Error("500");
         setToken(user, response, true);
-        response.sendRedirect("/");
+        GoToUrl(response,"/");
         return OK("注册成功");
     }
 }

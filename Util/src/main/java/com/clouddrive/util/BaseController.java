@@ -35,6 +35,10 @@ public class BaseController {
         return new ReturnMode<>(null, "OK");
     }
 
+    protected void GoToUrl(HttpServletResponse response, String url) throws IOException {
+        response.sendRedirect("/");
+    }
+
     protected UserMode getUser() {
         return (UserMode) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
