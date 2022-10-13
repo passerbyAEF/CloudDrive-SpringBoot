@@ -9,6 +9,8 @@ public interface FileLocalService {
 
     boolean MoveFile(UserMode user, int fileId, int toFolderId);
 
+    boolean CopyFile(UserMode user, int fileId, int toFolderId);
+
     boolean DeleteFile(UserMode user, int fileId);
 
     boolean RenameFile(UserMode user, int fileId, String name);
@@ -16,6 +18,10 @@ public interface FileLocalService {
     boolean CreateFolder(UserMode user, String name, int inFolderId);
 
     boolean MoveFolder(UserMode user, int folderId, int toFolderId);
+
+    boolean CopyFolder(UserMode user, int folderId, int toFolderId);
+
+    boolean isChild(int folderId, int toFolderId);
 
     boolean DeleteFolder(UserMode user, int folderId);
 

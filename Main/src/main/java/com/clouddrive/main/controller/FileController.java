@@ -88,6 +88,16 @@ public class FileController extends BaseController {
         return OK();
     }
 
+    @PostMapping("CopyFile")
+    ReturnMode<Object> CopyFile(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
+        if (!dataMap.containsKey("fileId") && !dataMap.containsKey("toFolderId"))
+            return Error("参数错误");
+        if (!fileLocalService.CopyFile(getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"))) {
+            return Error();
+        }
+        return OK();
+    }
+
     @PostMapping("DeleteFile")
     ReturnMode<Object> DeleteFile(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("fileId"))
@@ -118,7 +128,20 @@ public class FileController extends BaseController {
     ReturnMode<Object> MoveFolder(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("folderId") && !dataMap.containsKey("toFolderId"))
             return Error("参数错误");
+        if (fileLocalService.isChild(dataMap.get("folderId"), dataMap.get("toFolderId"))) {
+            return Error("请不要移动到子文件夹内");
+        }
         if (!fileLocalService.MoveFolder(getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"))) {
+            return Error();
+        }
+        return OK();
+    }
+
+    @PostMapping("CopyFolder")
+    ReturnMode<Object> CopyFolder(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
+        if (!dataMap.containsKey("folderId") && !dataMap.containsKey("toFolderId"))
+            return Error("参数错误");
+        if (!fileLocalService.CopyFolder(getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"))) {
             return Error();
         }
         return OK();

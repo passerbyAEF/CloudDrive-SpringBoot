@@ -15,12 +15,18 @@
     <select id="findFolderByParentIdAndUserId" resultMap="folderMode">
         select *
         from folder_table
+        where parent_id = #{arg1}
+          and owner_id = #{arg0};
+    </select>
+    <select id="findFolderByParentId" resultMap="folderMode">
+        select *
+        from folder_table
         where parent_id = #{arg1};
     </select>
     <select id="findRootFolderId" resultMap="folderMode">
         select *
         from folder_table
-        where owner_id = #{arg1} and parent_id is NULL
-        limit 1;
+        where owner_id = #{arg1}
+          and parent_id is NULL limit 1;
     </select>
 </mapper>

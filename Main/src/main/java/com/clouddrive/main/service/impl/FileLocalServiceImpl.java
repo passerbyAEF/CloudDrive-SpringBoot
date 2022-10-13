@@ -1,6 +1,5 @@
 package com.clouddrive.main.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
 import com.clouddrive.main.service.FileLocalService;
@@ -43,7 +42,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     public boolean MoveFile(UserMode user, int fileId, int toFolderId) {
         FileMode file = fileMapper.selectById(fileId);
         FolderMode toFolder = folderMapper.selectById(toFolderId);
-        if (file == null || toFolder == null || file.getUserId().equals(user.getId()) || toFolder.getOwnerId().equals(user.getId())) {
+        if (file == null || toFolder == null || !file.getUserId().equals(user.getId()) || !toFolder.getOwnerId().equals(user.getId())) {
             return false;
         }
         file.setUpdateTime(new Date());
@@ -52,9 +51,24 @@ public class FileLocalServiceImpl implements FileLocalService {
     }
 
     @Override
+    public boolean CopyFile(UserMode user, int fileId, int toFolderId) {
+        FileMode file = fileMapper.selectById(fileId);
+        FileMode newFile = new FileMode();
+        newFile.setName(file.getName());
+        newFile.setHashId(file.getHashId());
+        newFile.setStorage(file.getStorage());
+        newFile.setUserId(user.getId());
+        newFile.setFolderId(toFolderId);
+        Date now = new Date();
+        newFile.setCreateTime(now);
+        newFile.setUpdateTime(now);
+        return fileMapper.insert(newFile) != 0;
+    }
+
+    @Override
     public boolean DeleteFile(UserMode user, int fileId) {
         FileMode file = fileMapper.selectById(fileId);
-        if (file == null || file.getUserId().equals(user.getId())) {
+        if (file == null || !file.getUserId().equals(user.getId())) {
             return false;
         }
         file.setUpdateTime(new Date());
@@ -65,7 +79,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     @Override
     public boolean RenameFile(UserMode user, int fileId, String name) {
         FileMode file = fileMapper.selectById(fileId);
-        if (file == null || file.getUserId().equals(user.getId())) {
+        if (file == null || !file.getUserId().equals(user.getId())) {
             return false;
         }
         file.setUpdateTime(new Date());
@@ -92,7 +106,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     public boolean MoveFolder(UserMode user, int folderId, int toFolderId) {
         FolderMode folder = folderMapper.selectById(folderId);
         FolderMode toFolder = folderMapper.selectById(toFolderId);
-        if (folder == null || toFolder == null || folder.getOwnerId().equals(user.getId()) || toFolder.getOwnerId().equals(user.getId())) {
+        if (folder == null || toFolder == null || !folder.getOwnerId().equals(user.getId()) || !toFolder.getOwnerId().equals(user.getId())) {
             return false;
         }
         folder.setParentId(toFolderId);
@@ -101,9 +115,69 @@ public class FileLocalServiceImpl implements FileLocalService {
     }
 
     @Override
+    public boolean isChild(int folderId, int findId) {
+        if(folderId==findId) return true;
+        List<FolderMode> folderList = folderMapper.findFolderByParentId(folderId);
+        boolean k = false;
+        for (FolderMode item : folderList) {
+            if (item.getId() == findId) k = true;
+            k = k || isChild(item.getId(), findId);
+        }
+        return k;
+    }
+
+    @Override
+    public boolean CopyFolder(UserMode user, int folderId, int toFolderId) {
+        FolderMode folder = folderMapper.selectById(folderId);
+        FolderMode newFolder = new FolderMode();
+        newFolder.setName(folder.getName());
+        //newFolder.setParentId(toFolderId);
+        newFolder.setOwnerId(user.getId());
+        Date now = new Date();
+        newFolder.setCreateTime(now);
+        newFolder.setUpdateTime(now);
+        folderMapper.insert(newFolder);
+
+        List<FileMode> fileList = fileMapper.findFileByFolderIdAndUserId(user.getId(), folderId);
+        List<FolderMode> folderList = folderMapper.findFolderByParentIdAndUserId(user.getId(), folderId);
+        for (FolderMode item : folderList) {
+            copyFolderNode(user, item.getId(), newFolder.getId());
+        }
+        for (FileMode item : fileList) {
+            CopyFile(user, item.getId(), newFolder.getId());
+        }
+
+        newFolder.setParentId(toFolderId);
+        folderMapper.updateById(newFolder);
+        return true;
+    }
+
+    private int copyFolderNode(UserMode user, int folderId, int toFolderId) {
+        FolderMode folder = folderMapper.selectById(folderId);
+        FolderMode newFolder = new FolderMode();
+        newFolder.setName(folder.getName());
+        newFolder.setParentId(toFolderId);
+        newFolder.setOwnerId(user.getId());
+        Date now = new Date();
+        newFolder.setCreateTime(now);
+        newFolder.setUpdateTime(now);
+        folderMapper.insert(newFolder);
+
+        List<FileMode> fileList = fileMapper.findFileByFolderIdAndUserId(user.getId(), folderId);
+        List<FolderMode> folderList = folderMapper.findFolderByParentIdAndUserId(user.getId(), folderId);
+        for (FolderMode item : folderList) {
+            copyFolderNode(user, item.getId(), newFolder.getId());
+        }
+        for (FileMode item : fileList) {
+            CopyFile(user, item.getId(), newFolder.getId());
+        }
+        return newFolder.getId();
+    }
+
+    @Override
     public boolean DeleteFolder(UserMode user, int folderId) {
         FolderMode folder = folderMapper.selectById(folderId);
-        if (folder == null || folder.getOwnerId().equals(user.getId())) {
+        if (folder == null || !folder.getOwnerId().equals(user.getId())) {
             return false;
         }
         List<FolderMode> folderList = folderMapper.findFolderByParentIdAndUserId(user.getId(), folderId);
@@ -123,7 +197,7 @@ public class FileLocalServiceImpl implements FileLocalService {
     @Override
     public boolean RenameFolder(UserMode user, int folderId, String name) {
         FolderMode folder = folderMapper.selectById(folderId);
-        if (folder == null || folder.getOwnerId().equals(user.getId())) {
+        if (folder == null || !folder.getOwnerId().equals(user.getId())) {
             return false;
         }
         folder.setName(name);
