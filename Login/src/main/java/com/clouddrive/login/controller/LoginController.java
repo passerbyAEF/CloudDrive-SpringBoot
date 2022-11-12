@@ -36,16 +36,19 @@ public class LoginController extends BaseController {
         if (StringUtils.isEmpty(email) || StringUtils.isEmpty(pwd)) {
 //            response.sendRedirect("/login?meg=null");
             GoToUrl(response, "/");
+            return;
         }
         UserMode userMode = userService.getUserByEmail(email);
         if (userMode == null) {
 //            response.sendRedirect("/login?meg=usernull");
             GoToUrl(response, "/");
+            return;
         }
         pwd = DigestUtils.md5DigestAsHex((pwd).getBytes());
         if (!userMode.getPassword().equals(pwd)) {
 //            response.sendRedirect("/login?meg=uperror");
             GoToUrl(response, "/");
+            return;
         }
         setToken(userMode, response, remember);
         GoToUrl(response, "/");
