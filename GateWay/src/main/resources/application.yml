@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+    gateway:
+      routes:
+        - id: route
+          uri: http://localhost:5616
+          predicates:
+            - Cookie=Token, 123456789

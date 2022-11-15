@@ -10,9 +10,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <modules>
-        <module>Util</module>
         <module>Model</module>
+        <module>Security</module>
+        <module>Core</module>
+        <module>Redis</module>
     </modules>
     <artifactId>Common</artifactId>
     <packaging>pom</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 </project>

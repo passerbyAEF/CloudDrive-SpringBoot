@@ -9,6 +9,8 @@
     <modules>
         <module>Common</module>
         <module>Modules</module>
+        <module>Auth</module>
+        <module>GateWay</module>
     </modules>
     <name>CloudDrive-SpringBoot</name>
     <description>CloudDrive-SpringBoot</description>
