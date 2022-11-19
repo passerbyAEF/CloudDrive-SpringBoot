@@ -1,4 +1,4 @@
-package com.clouddrive.model.dto;
+package com.clouddrive.common.filecore.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +8,13 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
-public class CreateFolderDTO {
+public class UploadDTO {
     @NotBlank
     String name;
     @NonNull
-    Integer parentId;
+    Integer folderId;
+    @NotBlank
+    String hash;
+    @NonNull
+    Long size;
 }

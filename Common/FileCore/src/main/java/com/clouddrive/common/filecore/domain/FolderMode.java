@@ -1,4 +1,4 @@
-package com.clouddrive.model.data;
+package com.clouddrive.common.filecore.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -8,17 +8,14 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("file_table")
-public class FileMode {
+@TableName("folder_table")
+public class FolderMode {
     @TableId(type = IdType.AUTO)
     Integer id;
     String name;
-    Integer folderId;
-    String hashId;
-    Integer userId;
-    Long storage;
+    Integer ownerId;
+    Integer parentId;
     Date createTime;
     Date updateTime;
     Date deleteTime;
-
 }

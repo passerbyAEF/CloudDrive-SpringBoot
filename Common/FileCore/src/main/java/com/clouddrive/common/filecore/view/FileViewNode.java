@@ -1,7 +1,7 @@
-package com.clouddrive.model.view;
+package com.clouddrive.common.filecore.view;
 
-import com.clouddrive.model.data.FileMode;
-import com.clouddrive.model.data.FolderMode;
+import com.clouddrive.common.filecore.domain.FileMode;
+import com.clouddrive.common.filecore.domain.FolderMode;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 

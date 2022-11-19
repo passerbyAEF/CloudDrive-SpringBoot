@@ -7,7 +7,16 @@ spring:
         server-addr: 127.0.0.1:8848
     gateway:
       routes:
-        - id: route
-          uri: http://localhost:5616
+        - id: login_route
+          uri: lb://auth
+          order: 1
           predicates:
-            - Cookie=Token, 123456789
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=2
+            - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, localhost:8080,
+        - id: root_route
+          uri: http://localhost:4173/
+          order: 1000
+          predicates:
+            - Path=/**

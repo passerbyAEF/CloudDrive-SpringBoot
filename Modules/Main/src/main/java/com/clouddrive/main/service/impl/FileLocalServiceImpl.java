@@ -1,11 +1,11 @@
 package com.clouddrive.main.service.impl;
 
+import com.clouddrive.common.filecore.domain.FileMode;
+import com.clouddrive.common.filecore.domain.FolderMode;
+import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
 import com.clouddrive.main.service.FileLocalService;
-import com.clouddrive.model.data.FileMode;
-import com.clouddrive.model.data.FolderMode;
-import com.clouddrive.model.data.UserMode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,7 +116,7 @@ public class FileLocalServiceImpl implements FileLocalService {
 
     @Override
     public boolean isChild(int folderId, int findId) {
-        if(folderId==findId) return true;
+        if (folderId == findId) return true;
         List<FolderMode> folderList = folderMapper.findFolderByParentId(folderId);
         boolean k = false;
         for (FolderMode item : folderList) {

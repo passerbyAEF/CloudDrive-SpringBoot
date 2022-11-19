@@ -1,10 +1,10 @@
 package com.clouddrive.main.service.impl;
 
+import com.clouddrive.common.filecore.domain.FileMode;
+import com.clouddrive.common.redis.util.RedisUtil;
+import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.service.FileCoreService;
-import com.clouddrive.model.data.FileMode;
-import com.clouddrive.model.data.UserMode;
-import com.clouddrive.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class FileCoreServiceImpl implements FileCoreService {
 
-//    @Autowired
+    //    @Autowired
 //    private RocketMQTemplate updateTemplate;
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
@@ -31,7 +31,6 @@ public class FileCoreServiceImpl implements FileCoreService {
     private ObjectMapper objectMapper;
     @Autowired
     private FileMapper fileMapper;
-
     @Autowired
     private RedisUtil redisUtil;
 

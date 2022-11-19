@@ -1,9 +1,8 @@
 package com.clouddrive.main.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.clouddrive.model.data.FileMode;
+import com.clouddrive.common.filecore.domain.FileMode;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 

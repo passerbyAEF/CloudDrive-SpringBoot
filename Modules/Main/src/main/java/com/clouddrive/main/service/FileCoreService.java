@@ -1,6 +1,6 @@
 package com.clouddrive.main.service;
 
-import com.clouddrive.model.data.UserMode;
+import com.clouddrive.common.security.domain.UserMode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.IOException;

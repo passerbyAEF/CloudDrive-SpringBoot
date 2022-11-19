@@ -10,10 +10,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <modules>
-        <module>Model</module>
         <module>Security</module>
         <module>Core</module>
         <module>Redis</module>
+        <module>FileCore</module>
     </modules>
     <artifactId>Common</artifactId>
     <packaging>pom</packaging>

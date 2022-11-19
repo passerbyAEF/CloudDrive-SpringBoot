@@ -1,7 +1,7 @@
 package com.clouddrive.file.service.impl;
 
+import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.file.service.DownloadService;
-import com.clouddrive.util.RedisUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class DownloadServiceImpl implements DownloadService {
 
     @Override
     public FileInputStream DownloadFile(String downloadId) throws IOException {
-        String jsonStr = redisUtil.getString("downloadTask:" +downloadId);
+        String jsonStr = redisUtil.getString("downloadTask:" + downloadId);
         if (jsonStr == null)
             return null;
         Map<String, Object> map = objectMapper.readValue(jsonStr, new TypeReference<Map>() {

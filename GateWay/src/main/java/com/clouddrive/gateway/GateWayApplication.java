@@ -3,7 +3,7 @@ package com.clouddrive.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication()
 public class GateWayApplication {
 
     public static void main(String[] args) {

@@ -1,15 +1,16 @@
 package com.clouddrive.main.controller;
 
+import com.clouddrive.common.core.controller.BaseController;
+import com.clouddrive.common.core.domain.ReturnMode;
+import com.clouddrive.common.filecore.dto.CreateFolderDTO;
+import com.clouddrive.common.filecore.dto.RenameFileDTO;
+import com.clouddrive.common.filecore.dto.RenameFolderDTO;
+import com.clouddrive.common.filecore.dto.UploadDTO;
+import com.clouddrive.common.security.domain.UserMode;
+import com.clouddrive.common.security.util.UserUtil;
 import com.clouddrive.main.service.FileCoreService;
 import com.clouddrive.main.service.FileListService;
 import com.clouddrive.main.service.FileLocalService;
-import com.clouddrive.model.data.UserMode;
-import com.clouddrive.model.dto.CreateFolderDTO;
-import com.clouddrive.model.dto.RenameFileDTO;
-import com.clouddrive.model.dto.RenameFolderDTO;
-import com.clouddrive.model.dto.UploadDTO;
-import com.clouddrive.util.BaseController;
-import com.clouddrive.util.ReturnMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,21 +35,21 @@ public class FileController extends BaseController {
 
     @GetMapping("List")
     ReturnMode<Object> List(HttpServletResponse response, @RequestParam Integer folderId) {
-        UserMode user = getUser();
-        return OK(fileListService.getList(getUser(), folderId));
+        UserMode user = UserUtil.getUser();
+        return OK(fileListService.getList(user, folderId));
     }
 
     @GetMapping("GetRoot")
     ReturnMode<Object> GetRoot(HttpServletResponse response) {
-        UserMode user = getUser();
-        return OK(fileListService.getRoot(getUser()).getId());
+        UserMode user = UserUtil.getUser();
+        return OK(fileListService.getRoot(user).getId());
     }
 
     @PostMapping("Upload")
     ReturnMode<Object> Upload(HttpServletResponse response, @RequestBody @Valid UploadDTO uploadDTO) {
         String flag;
         try {
-            flag = fileCoreService.Upload(getUser(), uploadDTO.getName(), uploadDTO.getFolderId(), uploadDTO.getHash(), uploadDTO.getSize());
+            flag = fileCoreService.Upload(UserUtil.getUser(), uploadDTO.getName(), uploadDTO.getFolderId(), uploadDTO.getHash(), uploadDTO.getSize());
         } catch (IOException e) {
             return Error(e.getMessage());
         }
@@ -66,7 +67,7 @@ public class FileController extends BaseController {
             return Error("参数错误");
         String flag;
         try {
-            flag = fileCoreService.Download(getUser(), dataMap.get("fileId"));
+            flag = fileCoreService.Download(UserUtil.getUser(), dataMap.get("fileId"));
         } catch (IOException e) {
             return Error(e.getMessage());
         }
@@ -82,7 +83,7 @@ public class FileController extends BaseController {
     ReturnMode<Object> MoveFile(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("fileId") && !dataMap.containsKey("toFolderId"))
             return Error("参数错误");
-        if (!fileLocalService.MoveFile(getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"))) {
+        if (!fileLocalService.MoveFile(UserUtil.getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"))) {
             return Error();
         }
         return OK();
@@ -92,7 +93,7 @@ public class FileController extends BaseController {
     ReturnMode<Object> CopyFile(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("fileId") && !dataMap.containsKey("toFolderId"))
             return Error("参数错误");
-        if (!fileLocalService.CopyFile(getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"))) {
+        if (!fileLocalService.CopyFile(UserUtil.getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"))) {
             return Error();
         }
         return OK();
@@ -102,7 +103,7 @@ public class FileController extends BaseController {
     ReturnMode<Object> DeleteFile(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("fileId"))
             return Error("参数错误");
-        if (!fileLocalService.DeleteFile(getUser(), dataMap.get("fileId"))) {
+        if (!fileLocalService.DeleteFile(UserUtil.getUser(), dataMap.get("fileId"))) {
             return Error();
         }
         return OK();
@@ -110,7 +111,7 @@ public class FileController extends BaseController {
 
     @PostMapping("RenameFile")
     ReturnMode<Object> RenameFile(HttpServletResponse response, @RequestBody @Valid RenameFileDTO data) {
-        if (!fileLocalService.RenameFile(getUser(), data.getFileId(), data.getName())) {
+        if (!fileLocalService.RenameFile(UserUtil.getUser(), data.getFileId(), data.getName())) {
             return Error();
         }
         return OK();
@@ -118,7 +119,7 @@ public class FileController extends BaseController {
 
     @PostMapping("CreateFolder")
     ReturnMode<Object> CreateFolder(HttpServletResponse response, @RequestBody @Valid CreateFolderDTO folderDTO) {
-        if (!fileLocalService.CreateFolder(getUser(), folderDTO.getName(), folderDTO.getParentId())) {
+        if (!fileLocalService.CreateFolder(UserUtil.getUser(), folderDTO.getName(), folderDTO.getParentId())) {
             return Error();
         }
         return OK();
@@ -131,7 +132,7 @@ public class FileController extends BaseController {
         if (fileLocalService.isChild(dataMap.get("folderId"), dataMap.get("toFolderId"))) {
             return Error("请不要移动到子文件夹内");
         }
-        if (!fileLocalService.MoveFolder(getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"))) {
+        if (!fileLocalService.MoveFolder(UserUtil.getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"))) {
             return Error();
         }
         return OK();
@@ -141,7 +142,7 @@ public class FileController extends BaseController {
     ReturnMode<Object> CopyFolder(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("folderId") && !dataMap.containsKey("toFolderId"))
             return Error("参数错误");
-        if (!fileLocalService.CopyFolder(getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"))) {
+        if (!fileLocalService.CopyFolder(UserUtil.getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"))) {
             return Error();
         }
         return OK();
@@ -151,7 +152,7 @@ public class FileController extends BaseController {
     ReturnMode<Object> DeleteFolder(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("folderId"))
             return Error("参数错误");
-        if (!fileLocalService.DeleteFolder(getUser(), dataMap.get("folderId"))) {
+        if (!fileLocalService.DeleteFolder(UserUtil.getUser(), dataMap.get("folderId"))) {
             return Error();
         }
         return OK();
@@ -159,7 +160,7 @@ public class FileController extends BaseController {
 
     @PostMapping("RenameFolder")
     ReturnMode<Object> RenameFolder(HttpServletResponse response, @RequestBody @Valid RenameFolderDTO data) {
-        if (!fileLocalService.RenameFolder(getUser(), data.getFolderId(), data.getName())) {
+        if (!fileLocalService.RenameFolder(UserUtil.getUser(), data.getFolderId(), data.getName())) {
             return Error();
         }
         return OK();

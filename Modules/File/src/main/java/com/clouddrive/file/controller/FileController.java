@@ -1,10 +1,10 @@
 package com.clouddrive.file.controller;
 
-import com.clouddrive.file.flag.FileUploadState;
+import com.clouddrive.common.core.controller.BaseController;
+import com.clouddrive.common.core.domain.ReturnMode;
+import com.clouddrive.common.core.flag.FileUploadState;
 import com.clouddrive.file.service.DownloadService;
 import com.clouddrive.file.service.UploadService;
-import com.clouddrive.util.BaseController;
-import com.clouddrive.util.ReturnMode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class FileController extends BaseController {
     void Download(HttpServletResponse response, String downloadId, String fileName) {
         try {
             FileInputStream fileInputStream = downloadService.DownloadFile(downloadId);
-            if(fileInputStream==null)
+            if (fileInputStream == null)
                 throw new IOException();
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/octet-stream");

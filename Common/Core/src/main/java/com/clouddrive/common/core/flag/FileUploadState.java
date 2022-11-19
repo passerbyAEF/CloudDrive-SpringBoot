@@ -1,4 +1,4 @@
-package com.clouddrive.file.flag;
+package com.clouddrive.common.core.flag;
 
 public enum FileUploadState {
     OK, ERROR, INCOMPLETE, CHECKING

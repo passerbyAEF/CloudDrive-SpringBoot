@@ -1,18 +1,16 @@
 package com.clouddrive.common.redis.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
 public class RedisUtil {
 
+    RedisTemplate<String, Object> redisTemplate;
+
     public RedisUtil(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
-
-    private RedisTemplate<String, Object> redisTemplate;
 
     public void addStringAndSetTimeOut(String key, String value, int time) {
         addStringAndSetTimeOut(key, value, time, TimeUnit.MINUTES);

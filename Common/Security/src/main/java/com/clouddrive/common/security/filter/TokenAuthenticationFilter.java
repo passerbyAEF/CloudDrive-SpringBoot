@@ -4,7 +4,9 @@ import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.common.security.domain.UserMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -25,6 +27,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = null;
+        System.out.println(request.getRequestURI());
         for (Cookie c : request.getCookies()) {
             if (c.getName().equals("Token"))
                 token = c.getValue();
@@ -39,7 +42,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } else {
+            SecurityContextHolder.getContext().setAuthentication(getAnonymousAuthentication());
         }
         filterChain.doFilter(request, response);
+    }
+
+    AnonymousAuthenticationToken getAnonymousAuthentication() {
+        return new AnonymousAuthenticationToken("Anonymous", "anonymousUser", AuthorityUtils.createAuthorityList("ROLE_ANONYMOUS"));
     }
 }

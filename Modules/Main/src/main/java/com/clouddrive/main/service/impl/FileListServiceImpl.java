@@ -1,13 +1,12 @@
 package com.clouddrive.main.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.clouddrive.common.filecore.domain.FileMode;
+import com.clouddrive.common.filecore.domain.FolderMode;
+import com.clouddrive.common.filecore.view.FileViewNode;
+import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
 import com.clouddrive.main.service.FileListService;
-import com.clouddrive.model.data.FileMode;
-import com.clouddrive.model.data.FolderMode;
-import com.clouddrive.model.data.UserMode;
-import com.clouddrive.model.view.FileViewNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

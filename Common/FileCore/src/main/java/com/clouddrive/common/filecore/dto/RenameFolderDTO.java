@@ -1,4 +1,4 @@
-package com.clouddrive.model.dto;
+package com.clouddrive.common.filecore.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

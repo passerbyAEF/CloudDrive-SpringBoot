@@ -1,6 +1,6 @@
 package com.clouddrive.file.service;
 
-import com.clouddrive.file.flag.FileUploadState;
+import com.clouddrive.common.core.flag.FileUploadState;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.multipart.MultipartFile;
 

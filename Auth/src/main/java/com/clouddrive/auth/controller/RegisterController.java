@@ -2,10 +2,13 @@ package com.clouddrive.auth.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.clouddrive.auth.service.impl.UserServiceImpl;
+import com.clouddrive.common.core.constant.UrlStatus;
 import com.clouddrive.common.core.controller.BaseController;
 import com.clouddrive.common.core.domain.ReturnMode;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.common.security.domain.UserMode;
+import com.clouddrive.common.security.util.UserUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +33,8 @@ public class RegisterController extends BaseController {
     UserServiceImpl userService;
     @Autowired
     RedisUtil redisUtil;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @PostMapping("register")
     ReturnMode<Object> Register(HttpServletResponse response, @RequestParam String name, @RequestParam String email, @RequestParam String pwd) throws IOException {
@@ -55,8 +60,8 @@ public class RegisterController extends BaseController {
         li.add(new SimpleGrantedAuthority("ROLE_USER"));
         user.setAuthorities(li);
         if (!userService.register(user)) return Error("500");
-        setToken(user, response, true);
-        GoToUrl(response, "/");
+        UserUtil.setToken(user, response, true, redisUtil, objectMapper);
+        GoToUrl(response, UrlStatus.ROOT_URL);
         return OK("注册成功");
     }
 }

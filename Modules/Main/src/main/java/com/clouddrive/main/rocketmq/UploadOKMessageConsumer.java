@@ -1,7 +1,7 @@
 package com.clouddrive.main.rocketmq;
 
+import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.main.service.FileLocalService;
-import com.clouddrive.util.RedisUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;

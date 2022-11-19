@@ -1,6 +1,6 @@
 package com.clouddrive.main.service;
 
-import com.clouddrive.model.data.UserMode;
+import com.clouddrive.common.security.domain.UserMode;
 
 //主要承接不需要与文件中心交换数据的，只涉及到本地数据库修改的操作
 public interface FileLocalService {
