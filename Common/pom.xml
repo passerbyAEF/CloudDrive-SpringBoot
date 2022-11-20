@@ -14,6 +14,7 @@
         <module>Core</module>
         <module>Redis</module>
         <module>FileCore</module>
+        <module>RocketMQ</module>
     </modules>
     <artifactId>Common</artifactId>
     <packaging>pom</packaging>

@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.clouddrive.main.mapper.FileMapper">
-    <resultMap id="fileMode" type="com.clouddrive.model.data.FileMode">
+    <resultMap id="fileMode" type="com.clouddrive.common.filecore.domain.FileMode">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="folderId" column="folder_id"/>

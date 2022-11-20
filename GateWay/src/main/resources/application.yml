@@ -15,6 +15,16 @@ spring:
           filters:
             - StripPrefix=2
             - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, localhost:8080,
+
+        - id: appMain_route
+          uri: lb://appMain
+          order: 1
+          predicates:
+            - Path=/api/appMain/**
+          filters:
+            - StripPrefix=2
+            - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, localhost:8080,
+
         - id: root_route
           uri: http://localhost:4173/
           order: 1000

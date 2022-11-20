@@ -1,5 +1,6 @@
 package com.clouddrive.common.security.filter;
 
+import com.clouddrive.common.core.util.JwtUtil;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.common.security.domain.UserMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +35,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
         if (token != null) {
             //如果有Token
-            String str = redisUtil.getString(token);
+            String uuid = JwtUtil.getUUID(token);
+            String str = redisUtil.getString(uuid);
             if (str != null) {
                 //如果Redis中存放着Token，就提取出缓存在Redis中的用户信息
                 UserMode user = objectMapper.readValue(str, UserMode.class);

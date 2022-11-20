@@ -32,7 +32,6 @@ public class LoginController extends BaseController {
     @Autowired
     ObjectMapper objectMapper;
 
-
 //    @PreAuthorize("hasRole('ANONYMOUS')")
     @PostMapping("login")
     void Login(HttpServletResponse response, @RequestParam String email, @RequestParam String pwd, @RequestParam(defaultValue = "0") Boolean remember) throws IOException {
