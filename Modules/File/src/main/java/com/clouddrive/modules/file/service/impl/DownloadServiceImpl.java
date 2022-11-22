@@ -1,7 +1,7 @@
-package com.clouddrive.file.service.impl;
+package com.clouddrive.modules.file.service.impl;
 
 import com.clouddrive.common.redis.util.RedisUtil;
-import com.clouddrive.file.service.DownloadService;
+import com.clouddrive.modules.file.service.DownloadService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

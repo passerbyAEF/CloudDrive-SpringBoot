@@ -1,4 +1,4 @@
-package com.clouddrive.file;
+package com.clouddrive.modules.file;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -6,12 +6,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.stereotype.Component;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-@SpringBootApplication(scanBasePackages = "com.clouddrive", exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@EnableFeignClients(basePackages = "com.clouddrive")
 public class FileApplication implements ApplicationRunner {
 
     public static void main(String[] args) {

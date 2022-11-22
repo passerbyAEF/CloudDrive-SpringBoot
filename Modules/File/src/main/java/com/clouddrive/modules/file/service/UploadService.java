@@ -1,4 +1,4 @@
-package com.clouddrive.file.service;
+package com.clouddrive.modules.file.service;
 
 import com.clouddrive.common.core.flag.FileUploadState;
 import com.fasterxml.jackson.core.JsonProcessingException;

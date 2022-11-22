@@ -1,4 +1,4 @@
-package com.clouddrive.file.service;
+package com.clouddrive.modules.file.service;
 
 import java.io.FileInputStream;
 import java.io.IOException;

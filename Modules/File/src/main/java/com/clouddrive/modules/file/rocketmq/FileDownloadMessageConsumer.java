@@ -1,4 +1,4 @@
-package com.clouddrive.file.rocketmq;
+package com.clouddrive.modules.file.rocketmq;
 
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.fasterxml.jackson.core.type.TypeReference;

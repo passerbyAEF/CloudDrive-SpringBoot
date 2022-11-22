@@ -1,4 +1,4 @@
-package com.clouddrive.file;
+package com.clouddrive.modules.file;
 
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;

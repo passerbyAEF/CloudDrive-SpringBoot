@@ -1,10 +1,10 @@
-package com.clouddrive.file.controller;
+package com.clouddrive.modules.file.controller;
 
 import com.clouddrive.common.core.controller.BaseController;
 import com.clouddrive.common.core.domain.ReturnMode;
 import com.clouddrive.common.core.flag.FileUploadState;
-import com.clouddrive.file.service.DownloadService;
-import com.clouddrive.file.service.UploadService;
+import com.clouddrive.modules.file.service.DownloadService;
+import com.clouddrive.modules.file.service.UploadService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

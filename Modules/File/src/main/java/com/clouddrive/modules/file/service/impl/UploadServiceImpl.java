@@ -1,8 +1,8 @@
-package com.clouddrive.file.service.impl;
+package com.clouddrive.modules.file.service.impl;
 
 import com.clouddrive.common.core.flag.FileUploadState;
 import com.clouddrive.common.redis.util.RedisUtil;
-import com.clouddrive.file.service.UploadService;
+import com.clouddrive.modules.file.service.UploadService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
