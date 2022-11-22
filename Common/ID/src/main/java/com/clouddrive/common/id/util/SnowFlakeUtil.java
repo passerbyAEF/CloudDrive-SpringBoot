@@ -7,10 +7,10 @@ public class SnowFlakeUtil {
     private static final SnowFlakeService snowFlakeService;
 
     static {
-        snowFlakeService = new SnowFlakeService(4, 4, 0);
+        snowFlakeService = new SnowFlakeService(0);
     }
 
-    public static long getNext() {
-        return snowFlakeService.nextId();
+    public static long getNext(int workId) {
+        return snowFlakeService.nextId(workId);
     }
 }

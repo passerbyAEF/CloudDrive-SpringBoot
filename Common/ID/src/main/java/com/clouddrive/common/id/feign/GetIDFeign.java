@@ -9,4 +9,7 @@ public interface GetIDFeign {
 
     @GetMapping("getID")
     Long getID();
+
+    @GetMapping("getNodeID")
+    Long getNodeID();
 }

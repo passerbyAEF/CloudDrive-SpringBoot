@@ -7,4 +7,9 @@ public class GetIDFeignFallback implements GetIDFeign {
     public Long getID() {
         return -1L;
     }
+
+    @Override
+    public Long getNodeID() {
+        return -1L;
+    }
 }
