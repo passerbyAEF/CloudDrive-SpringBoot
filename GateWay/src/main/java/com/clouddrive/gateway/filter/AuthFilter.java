@@ -1,6 +1,5 @@
 package com.clouddrive.gateway.filter;
 
-import com.clouddrive.common.core.constant.SecurityConstants;
 import com.clouddrive.common.core.constant.UrlStatus;
 import com.clouddrive.common.core.util.JwtUtil;
 import com.clouddrive.common.redis.util.RedisUtil;
@@ -36,7 +35,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         ServerHttpResponse response = exchange.getResponse();
-
         String url = request.getURI().getPath();
         if (!matches(url)) {
             return chain.filter(exchange);
