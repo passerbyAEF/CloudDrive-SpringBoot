@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public interface GetIDFeign {
 
     @GetMapping("getID")
-    Long getID();
+    Long getID(Integer workId);
 
     @GetMapping("getNodeID")
     Long getNodeID();

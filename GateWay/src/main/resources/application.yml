@@ -34,13 +34,13 @@ spring:
             - StripPrefix=2
             - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, localhost:8080,
 
-        - id: id_route
-          uri: fs://IDServer
+        - id: file_route
+          uri: fs://fileServer
           order: 1
           predicates:
-            - Path=/id/**
+            - Path=/api/file/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
 
         - id: root_route
           uri: http://localhost:4173/

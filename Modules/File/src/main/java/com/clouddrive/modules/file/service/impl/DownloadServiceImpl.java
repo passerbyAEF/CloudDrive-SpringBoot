@@ -22,7 +22,8 @@ public class DownloadServiceImpl implements DownloadService {
     RedisUtil redisUtil;
     @Autowired
     ObjectMapper objectMapper;
-    @Value("${CloudDrive.SavePath}")
+
+    @Value("${clouddrive.save-path}")
     String fileSavePath;
 
     @Override

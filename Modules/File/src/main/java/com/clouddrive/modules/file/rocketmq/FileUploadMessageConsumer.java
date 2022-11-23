@@ -32,9 +32,10 @@ public class FileUploadMessageConsumer implements RocketMQListener<String> {
     ObjectMapper objectMapper;
     @Autowired
     RocketMQTemplate rocketMQTemplate;
-    @Value("${CloudDrive.SavePath}")
+
+    @Value("${clouddrive.save-path}")
     String fileSavePath;
-    @Value("${CloudDrive.BufferPath}")
+    @Value("${clouddrive.buffer-path}")
     String fileBufferPath;
 
     @SneakyThrows

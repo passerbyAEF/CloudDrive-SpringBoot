@@ -16,6 +16,7 @@
         <module>FileCore</module>
         <module>RocketMQ</module>
         <module>ID</module>
+        <module>MetaData</module>
     </modules>
     <artifactId>Common</artifactId>
     <packaging>pom</packaging>

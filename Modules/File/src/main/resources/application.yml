@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: fileServer
+  redis:
+    port: 6379
+    host: localhost
+
+server:
+  port: 5615
+
+rocketmq:
+  name-server: 172.17.0.1:9876
+  producer:
+    group: cloudDriveFileCore
+    send-message-timeout: 10000
+
+clouddrive:
+  save-path: E:\\file
+  buffer-path: E:\\buffer

@@ -37,9 +37,9 @@ public class UploadServiceImpl implements UploadService {
     ObjectMapper objectMapper;
     @Autowired
     RocketMQTemplate rocketMQTemplate;
-    @Value("${CloudDrive.SavePath}")
+    @Value("${clouddrive.save-path}")
     String fileSavePath;
-    @Value("${CloudDrive.BufferPath}")
+    @Value("${clouddrive.buffer-path}")
     String fileBufferPath;
 
     //10MB

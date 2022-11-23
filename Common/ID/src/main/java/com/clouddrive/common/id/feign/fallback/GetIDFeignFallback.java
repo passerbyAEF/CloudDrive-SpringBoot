@@ -4,7 +4,7 @@ import com.clouddrive.common.id.feign.GetIDFeign;
 
 public class GetIDFeignFallback implements GetIDFeign {
     @Override
-    public Long getID() {
+    public Long getID(Integer workId) {
         return -1L;
     }
 
