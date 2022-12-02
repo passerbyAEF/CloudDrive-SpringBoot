@@ -19,7 +19,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 @Slf4j
-@Controller
+@Controller("File")
 public class FileController extends BaseController {
 
     @Autowired
@@ -32,7 +32,9 @@ public class FileController extends BaseController {
         try {
             FileUploadState state = uploadService.UploadFile(uploadId, partId, file);
 
-            if (state == FileUploadState.OK || state == FileUploadState.INCOMPLETE) {
+            if (state == FileUploadState.OK) {
+                return OK();
+            } else if (state == FileUploadState.INCOMPLETE) {
                 return OK();
             } else if (state == FileUploadState.ERROR) {
                 uploadService.removeTask(uploadId);
@@ -41,9 +43,9 @@ public class FileController extends BaseController {
         } catch (IOException e) {
             e.printStackTrace();
             uploadService.removeTask(uploadId);
-            return Error("Bad!");
+            return Error();
         }
-        return Error("Bad!");
+        return Error();
     }
 
     @GetMapping("Download")

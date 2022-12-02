@@ -30,11 +30,11 @@ public class FileApplication implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-//        if (!new File(fileSavePath).exists()) {
-//            throw new FileNotFoundException(fileSavePath + "不存在！");
-//        }
-//        if (!new File(fileBufferPath).exists()) {
-//            throw new FileNotFoundException(fileBufferPath + "不存在！");
-//        }
+        if (!new File(fileSavePath).exists()) {
+            throw new FileNotFoundException(fileSavePath + "不存在！");
+        }
+        if (!new File(fileBufferPath).exists()) {
+            throw new FileNotFoundException(fileBufferPath + "不存在！");
+        }
     }
 }

@@ -6,7 +6,7 @@ import com.alibaba.cloud.nacos.NacosServiceManager;
 import com.alibaba.cloud.nacos.discovery.NacosDiscoveryClientConfiguration;
 import com.alibaba.cloud.nacos.discovery.NacosWatch;
 import com.clouddrive.common.id.feign.GetIDFeign;
-import com.clouddrive.common.metadata.constant.MetaDataConstant;
+import com.clouddrive.common.metadata.constant.WorkIDConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -29,7 +29,7 @@ public class WordIdAutoSetConfiguration {
     public NacosWatch nacosWatch(NacosServiceManager nacosServiceManager, NacosDiscoveryProperties nacosDiscoveryProperties, WebApplicationContext webApplicationContext) throws Exception {
         Long id = getIDFeign.getNodeID();
         if (id == -1) throw new Exception("服务访问失败！");
-        MetaDataConstant.workId = id;
+        WorkIDConstants.NodeID = id;
         nacosDiscoveryProperties.getMetadata().put("workId", id.toString());
         return new NacosWatch(nacosServiceManager, nacosDiscoveryProperties);
     }

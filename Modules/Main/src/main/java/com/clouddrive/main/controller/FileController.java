@@ -47,19 +47,19 @@ public class FileController extends BaseController {
 
     @PostMapping("Upload")
     ReturnMode<Object> Upload(HttpServletResponse response, @RequestBody @Valid UploadDTO uploadDTO) {
-        String flag;
+        Map<String, String> data;
         try {
-            flag = fileCoreService.Upload(UserUtil.getUser(), uploadDTO.getName(), uploadDTO.getFolderId(), uploadDTO.getHash(), uploadDTO.getSize());
+            data = fileCoreService.Upload(UserUtil.getUser(), uploadDTO.getName(), uploadDTO.getFolderId(), uploadDTO.getHash(), uploadDTO.getSize());
         } catch (IOException e) {
-            return Error(e.getMessage());
+            return Error();
         }
-        return OK(flag);
+        return OK(data);
     }
 
-    @GetMapping("GetUploadFlag")
-    ReturnMode<Object> GetUploadFlag(HttpServletResponse response, @RequestParam String flag) {
-        return OK(fileCoreService.getUploadFlag(flag));
-    }
+//    @GetMapping("GetUploadFlag")
+//    ReturnMode<Object> GetUploadFlag(HttpServletResponse response, @RequestParam String flag) {
+//        return OK(fileCoreService.getUploadFlag(flag));
+//    }
 
     @PostMapping("Download")
     ReturnMode<Object> Download(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {

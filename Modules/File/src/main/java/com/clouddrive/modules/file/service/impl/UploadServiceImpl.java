@@ -1,7 +1,10 @@
 package com.clouddrive.modules.file.service.impl;
 
 import com.clouddrive.common.core.flag.FileUploadState;
+import com.clouddrive.common.id.feign.GetIDFeign;
+import com.clouddrive.common.metadata.constant.WorkIDConstants;
 import com.clouddrive.common.redis.util.RedisUtil;
+import com.clouddrive.modules.file.feign.MainServiceFeign;
 import com.clouddrive.modules.file.service.UploadService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -18,14 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.nio.file.Paths;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -37,6 +35,11 @@ public class UploadServiceImpl implements UploadService {
     ObjectMapper objectMapper;
     @Autowired
     RocketMQTemplate rocketMQTemplate;
+    @Autowired
+    GetIDFeign getIDFeign;
+    @Autowired
+    MainServiceFeign mainServiceFeign;
+
     @Value("${clouddrive.save-path}")
     String fileSavePath;
     @Value("${clouddrive.buffer-path}")
@@ -53,13 +56,14 @@ public class UploadServiceImpl implements UploadService {
 
         String hashStr = map.get("hash").toString();
         String sizeStr = map.get("size").toString();
-        RandomAccessFile randomAccessFile = new RandomAccessFile(fileBufferPath + hashStr, "w");
+        String fileBufferSavePath = Paths.get(fileBufferPath, hashStr + ":" + sizeStr).toString();
+
+        RandomAccessFile randomAccessFile = new RandomAccessFile(fileBufferSavePath, "w");
         randomAccessFile.seek(partSize * partId);
         randomAccessFile.write(file.getBytes());
         randomAccessFile.close();
 
         List<String> strList = (List<String>) map.get("wrote");
-
         List<Range> rangeList = new ArrayList<>();
         for (String s : strList) {
             String[] sl = s.split("-");
@@ -75,57 +79,39 @@ public class UploadServiceImpl implements UploadService {
         //如果已经全部输入完毕
         if (rangeList.size() == 1 && rangeList.get(0).getStart() == 0 && rangeList.get(0).getEnd() == Long.parseLong(map.get("size").toString())) {
             //判断MD5值
-            File bufferFile = new File(fileBufferPath + hashStr);
+            File bufferFile = new File(fileBufferSavePath);
             String md5Hash = DigestUtils.md5Hex(new FileInputStream(bufferFile));
             if (!md5Hash.equals(hashStr)) {
                 return FileUploadState.ERROR;
             }
-
-            //检查是否已经有相同MD5,内容（这里只检查长度）不同的文件（发生碰撞
-            File fileSaveFolder = new File(fileSavePath + hashStr);
+            //检查是否已经有MD5碰撞
+            String fileSaveFolderPath = Paths.get(fileSavePath, hashStr).toString();
+            String fileSavePath = Paths.get(fileSaveFolderPath, sizeStr).toString();
+            //检查是否有这个文件夹
+            File fileSaveFolder = new File(fileSaveFolderPath);
             if (!fileSaveFolder.exists()) {
+                //没有就建
                 if (!fileSaveFolder.mkdir()) {
+                    throw new IOException("文件系统错误！");
+                }
+            }
+            //检查是否有这个文件
+            File fileSave = new File(fileSavePath);
+            if (!fileSave.exists()) {
+                //没有就存到这个位置
+                if (!bufferFile.renameTo(fileSave)) {
                     return FileUploadState.ERROR;
                 }
+            } else {
+                //有？那就撞了，按照设计，这种情况能撞上，极极极极极极极极大可能就是一个文件，那就不管了
+                bufferFile.delete();
             }
-            int fileId = 0;
-            for (File f : fileSaveFolder.listFiles()) {
-                if (fileCheck(f.getCanonicalPath(), fileBufferPath + hashStr)) {
-                    break;
-                }
-                fileId++;
-            }
-            File saveFile = new File(fileSaveFolder.getCanonicalPath() + "\\" + hashStr + ":" + fileId);
-            if (!bufferFile.renameTo(saveFile)) {
-                return FileUploadState.ERROR;
-            }
-
             redisUtil.removeString(uploadId);
-
-            Map<String, Object> data = new HashMap<>();
-            data.put("hash", hashStr);
-            data.put("size", sizeStr);
-            data.put("fileId", fileId);
-            String jsonStr = objectMapper.writeValueAsString(data);
-
-            //将当前文件路径记录发送回主程序
-            rocketMQTemplate.asyncSend("file:uploadOK", objectMapper.writeValueAsString(data), new SendCallback() {
-                @Override
-                public void onSuccess(SendResult var1) {
-                    log.info("file:uploadOK:" + jsonStr + "发送成功");
-                }
-
-                @SneakyThrows
-                @Override
-                public void onException(Throwable var1) {
-                    //RocketMQ发送失败了（可能是挂了），重复发送
-                    Thread.sleep(1000);
-                    rocketMQTemplate.asyncSend("file:uploadOK", jsonStr, this);
-                }
-            });
-            return FileUploadState.OK;
+            if (mainServiceFeign.UploadOK(uploadId, hashStr + ":" + sizeStr))
+                return FileUploadState.OK;
+            else
+                return FileUploadState.ERROR;
         }
-
         //生成JSONArray字符串
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append('[');
@@ -172,13 +158,37 @@ public class UploadServiceImpl implements UploadService {
         redisUtil.removeString(uploadId);
     }
 
+    @Override
+    public Map<String, String> createUpload(String hash, Long size) throws IOException {
+        //创建一个空文件占位
+        RandomAccessFile file = new RandomAccessFile(Paths.get(fileBufferPath, hash + ":" + size).toString(), "rw");
+        //file.setLength(Long.getLong(size));
+        file.setLength(1);
+        file.close();
+
+        Long uploadId = getIDFeign.getID(WorkIDConstants.UploadID);
+        Map<String, String> reMap = new HashMap<>();
+        reMap.put("uploadId", uploadId.toString());
+        reMap.put("nodeId", WorkIDConstants.NodeID.toString());
+
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("hash", hash);
+        dataMap.put("size", size);
+        dataMap.put("wrote", new ArrayList<String>());
+        String dataJsonStr = objectMapper.writeValueAsString(dataMap);
+//        String mess = String.format("{\"hash\":\"%s\",\"size\":\"%s\",\"wrote\":[]}", hash, size);
+        redisUtil.addStringAndSetTimeOut(uploadId.toString(), dataJsonStr, 5);
+        log.info("已记录Upload");
+
+        return reMap;
+    }
+
     boolean fileCheck(String path1, String path2) throws IOException {
         RandomAccessFile file1 = new RandomAccessFile(path1, "r");
         RandomAccessFile file2 = new RandomAccessFile(path2, "r");
         if (file1.length() == file2.length()) {
             return true;
         }
-
         //检查最后512个bit是否相等
 //        if (file1.length() > 512) {
 //            file1.seek(file1.length() - 512);

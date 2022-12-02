@@ -29,10 +29,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = null;
         System.out.println(request.getRequestURI());
-        for (Cookie c : request.getCookies()) {
-            if (c.getName().equals("Token"))
-                token = c.getValue();
-        }
+        if (request.getCookies() != null)
+            for (Cookie c : request.getCookies()) {
+                if (c.getName().equals("Token"))
+                    token = c.getValue();
+            }
         if (token != null) {
             //如果有Token
             String uuid = JwtUtil.getUUID(token);
@@ -47,6 +48,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         } else {
             SecurityContextHolder.getContext().setAuthentication(getAnonymousAuthentication());
         }
+
         filterChain.doFilter(request, response);
     }
 

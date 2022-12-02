@@ -8,6 +8,10 @@ import java.io.IOException;
 
 public class BaseController {
 
+    public void set500(HttpServletResponse response) {
+        response.setStatus(HttpStatus.ERROR);
+    }
+
     public ReturnMode<Object> Error() {
         return Error(null, "错误！");
     }

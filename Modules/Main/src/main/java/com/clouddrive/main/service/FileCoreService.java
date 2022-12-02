@@ -4,15 +4,18 @@ import com.clouddrive.common.security.domain.UserMode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.IOException;
+import java.util.Map;
 
 //主要承接需要与文件中心交换数据的操作
 public interface FileCoreService {
 
-    String Upload(UserMode user, String name, int folderId, String hash, long size) throws JsonProcessingException;
+    Map<String,String> Upload(UserMode user, String name, int folderId, String hash, long size) throws JsonProcessingException;
 
+    @Deprecated
     String getUploadFlag(String flag);
 
     String Download(UserMode user, int fileId) throws IOException;
 
+    @Deprecated
     String getDownloadFlag(String flag);
 }

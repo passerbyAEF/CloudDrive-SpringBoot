@@ -3,6 +3,7 @@ package com.clouddrive.main.service.impl;
 import com.clouddrive.common.filecore.domain.FileMode;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.common.security.domain.UserMode;
+import com.clouddrive.main.feign.FileCoreFeign;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.service.FileCoreService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,43 +29,38 @@ public class FileCoreServiceImpl implements FileCoreService {
     @Autowired
     private RocketMQTemplate rocketMQTemplate;
     @Autowired
+    private RedisUtil redisUtil;
+
+    @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private FileMapper fileMapper;
+
     @Autowired
-    private RedisUtil redisUtil;
+    FileCoreFeign fileCoreFeign;
 
     @Override
-    public String Upload(UserMode user, String name, int folderId, String hash, long size) throws JsonProcessingException {
-        //打包数据发送给文件中心
-        Map<String, Object> map = new HashMap<>();
-        map.put("hash", hash);
-        map.put("size", size);
-        String json = objectMapper.writeValueAsString(map);
-        rocketMQTemplate.asyncSend("file:upload", json, new SendCallback() {
-            @Override
-            public void onSuccess(SendResult sendResult) {
+    public Map<String, String> Upload(UserMode user, String name, int folderId, String hash, long size) throws JsonProcessingException {
+        Map<String, String> map = fileCoreFeign.CreateUpdate(hash, size);
+        if (map == null) {
+            return null;
+        }
 
-            }
+        String UploadID = map.get("uploadId");
 
-            @Override
-            public void onException(Throwable throwable) {
-                //发送失败，不重复发送了，直接放弃
-                redisUtil.addStringAndSetTimeOut("uploadReturn:" + hash + ":" + size, "error", 5);
-            }
-        });
-
+        Map<String, Object> dataMap = new HashMap<>();
         //将相关数据暂存入Redis，等到之后文件中心完全接收完毕文件后再读取
         //Redis用hash+文件长度做名称，避免重名
-        map = new HashMap<>();
-        map.put("name", name);
-        map.put("folderId", folderId);
-        map.put("user", user.getId());
-        redisUtil.addStringAndSetTimeOut("uploadData:" + hash + ":" + size, objectMapper.writeValueAsString(map), 24, TimeUnit.HOURS);
+        dataMap.put("name", name);
+        dataMap.put("folderId", folderId);
+        dataMap.put("size", size);
+        dataMap.put("user", user.getId());
+        redisUtil.addStringAndSetTimeOut("uploadData:" + UploadID, objectMapper.writeValueAsString(dataMap), 24, TimeUnit.HOURS);
 
-        return hash + ":" + size;
+        return map;
     }
 
+    @Deprecated
     @Override
     public String getUploadFlag(String flag) {
         String reStr = redisUtil.getString("uploadReturn:" + flag);
@@ -99,6 +95,7 @@ public class FileCoreServiceImpl implements FileCoreService {
         return flag;
     }
 
+    @Deprecated
     @Override
     public String getDownloadFlag(String flag) {
         String reStr = redisUtil.getString("downloadReturn:" + flag);
