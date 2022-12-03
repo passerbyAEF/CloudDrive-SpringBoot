@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -17,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @ResponseBody
-@Controller("/System")
+@Controller
+@RequestMapping("/System")
 public class InternalController extends BaseController {
     @Autowired
     RedisUtil redisUtil;

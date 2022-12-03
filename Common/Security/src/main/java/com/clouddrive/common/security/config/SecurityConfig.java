@@ -33,22 +33,11 @@ public class SecurityConfig {
     @Bean
     @ConditionalOnMissingBean({SecurityFilterChain.class})
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-//        http.addFilterBefore(getTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/login", "/register", "/System**").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .csrf().disable();
-
         http.addFilterBefore(getTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> {
-                    auth.antMatchers("/login", "/register", "/System/**").permitAll()
+                    auth.antMatchers("/External/login", "/External/register", "/System/**").permitAll()
                             .anyRequest().hasRole("USER");
                 }).csrf().disable();
-
         return http.build();
     }
 

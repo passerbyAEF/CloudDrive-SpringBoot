@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @Controller
 @ResponseBody
-@RequestMapping("Sidebar")
+@RequestMapping("/External/Sidebar")
 public class SidebarController extends BaseController {
 
     @GetMapping("List")

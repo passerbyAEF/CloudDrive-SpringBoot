@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -19,7 +20,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 @Slf4j
-@Controller("File")
+@Controller
+@RequestMapping("/External/File")
 public class FileController extends BaseController {
 
     @Autowired

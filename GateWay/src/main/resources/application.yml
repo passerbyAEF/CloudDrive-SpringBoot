@@ -16,7 +16,7 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: login_route
+        - id: auth_route
           uri: lb://auth
           order: 1
           predicates:
@@ -24,6 +24,7 @@ spring:
           filters:
             - StripPrefix=2
             - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, localhost:8080,
+            - PrefixPath=/External
 
         - id: appMain_route
           uri: lb://appMain
@@ -33,6 +34,7 @@ spring:
           filters:
             - StripPrefix=2
             - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, localhost:8080,
+            - PrefixPath=/External
 
         - id: file_route
           uri: fs://fileServer
@@ -41,6 +43,7 @@ spring:
             - Path=/api/file/**
           filters:
             - StripPrefix=2
+            - PrefixPath=/External
 
         - id: root_route
           uri: http://localhost:4173/

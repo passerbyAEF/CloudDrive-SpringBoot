@@ -22,8 +22,7 @@ import java.util.Map;
 
 @Controller
 @ResponseBody
-@RequestMapping("File")
-@CrossOrigin
+@RequestMapping("/External/File")
 public class FileController extends BaseController {
 
     @Autowired

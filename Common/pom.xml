@@ -17,6 +17,7 @@
         <module>RocketMQ</module>
         <module>ID</module>
         <module>MetaData</module>
+        <module>Feign</module>
     </modules>
     <artifactId>Common</artifactId>
     <packaging>pom</packaging>

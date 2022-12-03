@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -21,6 +22,7 @@ import java.io.IOException;
 
 @ResponseBody
 @Controller
+@RequestMapping("External")
 public class LoginController extends BaseController {
 
     @Autowired
@@ -32,7 +34,7 @@ public class LoginController extends BaseController {
     @Autowired
     ObjectMapper objectMapper;
 
-//    @PreAuthorize("hasRole('ANONYMOUS')")
+    //    @PreAuthorize("hasRole('ANONYMOUS')")
     @PostMapping("login")
     void Login(HttpServletResponse response, @RequestParam String email, @RequestParam String pwd, @RequestParam(defaultValue = "0") Boolean remember) throws IOException {
         //检查登录数据合法性

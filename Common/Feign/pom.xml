@@ -10,12 +10,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.clouddrive.common</groupId>
-    <artifactId>ID</artifactId>
+    <artifactId>Feign</artifactId>
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.clouddrive.common</groupId>
-            <artifactId>Feign</artifactId>
+            <artifactId>core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
