@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -30,7 +31,7 @@ public class FileController extends BaseController {
     DownloadService downloadService;
 
     @PostMapping("Upload")
-    ReturnMode<Object> Upload(HttpServletResponse response, String uploadId, Integer partId, MultipartFile file) throws JsonProcessingException {
+    ReturnMode<Object> Upload(HttpServletResponse response, @RequestParam String uploadId, @RequestParam Integer partId, @RequestParam MultipartFile file) throws JsonProcessingException {
         try {
             FileUploadState state = uploadService.UploadFile(uploadId, partId, file);
 
@@ -51,7 +52,7 @@ public class FileController extends BaseController {
     }
 
     @GetMapping("Download")
-    void Download(HttpServletResponse response, String downloadId, String fileName) {
+    void Download(HttpServletResponse response, @RequestParam String downloadId, @RequestParam String fileName) {
         try {
             FileInputStream fileInputStream = downloadService.DownloadFile(downloadId);
             if (fileInputStream == null)

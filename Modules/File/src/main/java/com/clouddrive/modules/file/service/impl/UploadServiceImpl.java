@@ -56,7 +56,7 @@ public class UploadServiceImpl implements UploadService {
 
         String hashStr = map.get("hash").toString();
         String sizeStr = map.get("size").toString();
-        String fileBufferSavePath = Paths.get(fileBufferPath, hashStr + ":" + sizeStr).toString();
+        String fileBufferSavePath = Paths.get(fileBufferPath, hashStr + "_" + sizeStr).toString();
 
         RandomAccessFile randomAccessFile = new RandomAccessFile(fileBufferSavePath, "w");
         randomAccessFile.seek(partSize * partId);
@@ -107,7 +107,7 @@ public class UploadServiceImpl implements UploadService {
                 bufferFile.delete();
             }
             redisUtil.removeString(uploadId);
-            if (mainServiceFeign.UploadOK(uploadId, hashStr + ":" + sizeStr))
+            if (mainServiceFeign.UploadOK(uploadId, hashStr + "_" + sizeStr))
                 return FileUploadState.OK;
             else
                 return FileUploadState.ERROR;
@@ -124,7 +124,7 @@ public class UploadServiceImpl implements UploadService {
             stringBuilder.append(',');
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        stringBuilder.append(']');
+        stringBuilder.append(']'); 
         //更新入redis
         String mess = String.format("{\"hash\":\"%s\",\"size\":\"%s\",\"wrote\":%s}", hashStr, sizeStr, stringBuilder);
         redisUtil.addStringAndSetTimeOut(uploadId, mess, 5);
@@ -161,7 +161,7 @@ public class UploadServiceImpl implements UploadService {
     @Override
     public Map<String, String> createUpload(String hash, Long size) throws IOException {
         //创建一个空文件占位
-        RandomAccessFile file = new RandomAccessFile(Paths.get(fileBufferPath, hash + ":" + size).toString(), "rw");
+        RandomAccessFile file = new RandomAccessFile(Paths.get(fileBufferPath, hash + "_" + size).toString(), "rw");
         //file.setLength(Long.getLong(size));
         file.setLength(1);
         file.close();

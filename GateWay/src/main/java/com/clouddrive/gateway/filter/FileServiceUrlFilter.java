@@ -53,11 +53,11 @@ public class FileServiceUrlFilter implements GlobalFilter, Ordered {
         ServerWebExchangeUtils.addOriginalRequestUrl(exchange, url);
         String host = url.getHost();
         MultiValueMap<String, String> headers = exchange.getRequest().getHeaders();
-        if (!headers.containsKey("workId")) {
+        if (!headers.containsKey("nodeId")) {
             //请求参数不包含实例id,返回503
             return Return503(exchange);
         }
-        String workId = headers.get("workId").get(0);
+        String workId = headers.get("nodeId").get(0);
         return choose(host, workId).doOnNext((response) -> {
             URI uri = exchange.getRequest().getURI();
             String overrideScheme = null;

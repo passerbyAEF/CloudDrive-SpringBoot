@@ -8,7 +8,6 @@ import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.common.security.util.UserUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
