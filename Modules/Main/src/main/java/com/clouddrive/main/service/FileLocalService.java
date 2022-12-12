@@ -15,7 +15,7 @@ public interface FileLocalService {
 
     boolean RenameFile(UserMode user, int fileId, String name);
 
-    boolean CreateFolder(UserMode user, String name, int inFolderId);
+    int CreateFolder(UserMode user, String name, int inFolderId);
 
     boolean MoveFolder(UserMode user, int folderId, int toFolderId);
 

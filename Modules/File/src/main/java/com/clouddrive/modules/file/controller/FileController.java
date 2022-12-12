@@ -9,10 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -22,6 +19,7 @@ import java.io.IOException;
 
 @Slf4j
 @Controller
+@ResponseBody
 @RequestMapping("/External/File")
 public class FileController extends BaseController {
 
@@ -34,7 +32,6 @@ public class FileController extends BaseController {
     ReturnMode<Object> Upload(HttpServletResponse response, @RequestParam String uploadId, @RequestParam Integer partId, @RequestParam MultipartFile file) throws JsonProcessingException {
         try {
             FileUploadState state = uploadService.UploadFile(uploadId, partId, file);
-
             if (state == FileUploadState.OK) {
                 return OK();
             } else if (state == FileUploadState.INCOMPLETE) {

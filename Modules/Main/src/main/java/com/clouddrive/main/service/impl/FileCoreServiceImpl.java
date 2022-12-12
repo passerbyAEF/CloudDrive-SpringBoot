@@ -1,12 +1,14 @@
 package com.clouddrive.main.service.impl;
 
 import com.clouddrive.common.filecore.domain.FileMode;
+import com.clouddrive.common.filecore.dto.DownloadDataDTO;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.feign.FileCoreFeign;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.service.FileCoreService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.SendCallback;
@@ -75,15 +77,14 @@ public class FileCoreServiceImpl implements FileCoreService {
     @Override
     public String Download(UserMode user, int fileId) throws IOException {
         FileMode fileMode = fileMapper.selectById(fileId);
-        if (fileMode == null || fileMode.getUserId() != user.getId())
+        if (fileMode == null || !fileMode.getUserId().equals(user.getId()))
             throw new IOException("文件不存在");
-        String flag = fileMode.getHashId().split(":")[0] + fileMode.getStorage();
+        String flag = fileMode.getHashId();
         Map<String, String> data = new HashMap<>();
         data.put("hash", fileMode.getHashId());
         rocketMQTemplate.asyncSend("file:download", objectMapper.writeValueAsString(data), new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
-
             }
 
             @Override
@@ -95,14 +96,21 @@ public class FileCoreServiceImpl implements FileCoreService {
         return flag;
     }
 
-    @Deprecated
     @Override
-    public String getDownloadFlag(String flag) {
+    public DownloadDataDTO getDownloadFlag(String flag) throws JsonProcessingException {
         String reStr = redisUtil.getString("downloadReturn:" + flag);
+        DownloadDataDTO data=new DownloadDataDTO();
         if (reStr == null) {
-            return "wait";
+            return data;
         }
         redisUtil.removeString("downloadReturn:" + flag);
-        return reStr;
+        Map<String,String> map=objectMapper.readValue(reStr,new TypeReference<Map>() {
+        });
+
+        data.setReady(true);
+        data.setNodeId(Long.parseLong(map.get("nodeId")));
+        data.setDownloadID(map.get("downloadId"));
+
+        return data;
     }
 }

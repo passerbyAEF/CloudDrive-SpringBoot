@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -58,7 +60,7 @@ public class UploadServiceImpl implements UploadService {
         String sizeStr = map.get("size").toString();
         String fileBufferSavePath = Paths.get(fileBufferPath, hashStr + "_" + sizeStr).toString();
 
-        RandomAccessFile randomAccessFile = new RandomAccessFile(fileBufferSavePath, "w");
+        RandomAccessFile randomAccessFile = new RandomAccessFile(fileBufferSavePath, "rw");
         randomAccessFile.seek(partSize * partId);
         randomAccessFile.write(file.getBytes());
         randomAccessFile.close();
@@ -74,13 +76,15 @@ public class UploadServiceImpl implements UploadService {
         }
         rangeList.sort((x, y) -> (int) (x.getStart() - y.getStart()));
 
-        rangeList = EditWaitList(partSize * partId, partSize * (partId + 1), rangeList);
+        rangeList = EditWaitList(partSize * partId, partSize * partId + file.getSize(), rangeList);
 
         //如果已经全部输入完毕
         if (rangeList.size() == 1 && rangeList.get(0).getStart() == 0 && rangeList.get(0).getEnd() == Long.parseLong(map.get("size").toString())) {
             //判断MD5值
             File bufferFile = new File(fileBufferSavePath);
-            String md5Hash = DigestUtils.md5Hex(new FileInputStream(bufferFile));
+            FileInputStream fileInputStream = new FileInputStream(bufferFile);
+            String md5Hash = DigestUtils.md5Hex(fileInputStream);
+            fileInputStream.close();
             if (!md5Hash.equals(hashStr)) {
                 return FileUploadState.ERROR;
             }
@@ -99,9 +103,9 @@ public class UploadServiceImpl implements UploadService {
             File fileSave = new File(fileSavePath);
             if (!fileSave.exists()) {
                 //没有就存到这个位置
-                if (!bufferFile.renameTo(fileSave)) {
-                    return FileUploadState.ERROR;
-                }
+                Path savePath = Paths.get(fileSave.getPath());
+                Path bufferPath = Paths.get(bufferFile.getPath());
+                Files.move(bufferPath, savePath);
             } else {
                 //有？那就撞了，按照设计，这种情况能撞上，极极极极极极极极大可能就是一个文件，那就不管了
                 bufferFile.delete();
@@ -124,7 +128,7 @@ public class UploadServiceImpl implements UploadService {
             stringBuilder.append(',');
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        stringBuilder.append(']'); 
+        stringBuilder.append(']');
         //更新入redis
         String mess = String.format("{\"hash\":\"%s\",\"size\":\"%s\",\"wrote\":%s}", hashStr, sizeStr, stringBuilder);
         redisUtil.addStringAndSetTimeOut(uploadId, mess, 5);
@@ -139,20 +143,6 @@ public class UploadServiceImpl implements UploadService {
         Map<String, Object> map = objectMapper.readValue(uploadData, new TypeReference<Map>() {
         });
         String hashStr = map.get("hash").toString();
-        rocketMQTemplate.asyncSend("file:uploadERROR", hashStr, new SendCallback() {
-            @Override
-            public void onSuccess(SendResult var1) {
-                log.info("file:uploadERROR:" + hashStr + "发送成功");
-            }
-
-            @SneakyThrows
-            @Override
-            public void onException(Throwable var1) {
-                //RocketMQ发送失败了（可能是挂了），重复发送
-                Thread.sleep(1000);
-                rocketMQTemplate.asyncSend("file:uploadERROR", hashStr, this);
-            }
-        });
         File file = new File(fileSavePath + hashStr);
         file.delete();
         redisUtil.removeString(uploadId);

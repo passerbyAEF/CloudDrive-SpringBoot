@@ -1,5 +1,6 @@
 package com.clouddrive.main.service;
 
+import com.clouddrive.common.filecore.dto.DownloadDataDTO;
 import com.clouddrive.common.security.domain.UserMode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -16,6 +17,5 @@ public interface FileCoreService {
 
     String Download(UserMode user, int fileId) throws IOException;
 
-    @Deprecated
-    String getDownloadFlag(String flag);
+    DownloadDataDTO getDownloadFlag(String flag) throws JsonProcessingException;
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @Slf4j
@@ -33,7 +34,7 @@ public class DownloadServiceImpl implements DownloadService {
             return null;
         Map<String, Object> map = objectMapper.readValue(jsonStr, new TypeReference<Map>() {
         });
-        File file = new File(fileSavePath + "\\" + map.get("hash") + "\\" + map.get("fileId"));
+        File file = new File(Paths.get(fileSavePath, map.get("hash").toString(), map.get("fileId").toString()).toString());
         if (!file.exists()) {
             return null;
         }

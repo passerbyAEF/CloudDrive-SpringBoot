@@ -88,9 +88,9 @@ public class FileLocalServiceImpl implements FileLocalService {
     }
 
     @Override
-    public boolean CreateFolder(UserMode user, String name, int inFolderId) {
+    public int CreateFolder(UserMode user, String name, int inFolderId) {
         if (folderMapper.selectById(inFolderId) == null) {
-            return false;
+            return -1;
         }
         FolderMode folder = new FolderMode();
         folder.setName(name);
@@ -99,7 +99,9 @@ public class FileLocalServiceImpl implements FileLocalService {
         Date now = new Date();
         folder.setCreateTime(now);
         folder.setUpdateTime(now);
-        return folderMapper.insert(folder) != 0;
+        if (folderMapper.insert(folder) == 0)
+            return -1;
+        return folder.getId();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.clouddrive.modules.file.rocketmq;
 
+import com.clouddrive.common.id.feign.GetIDFeign;
+import com.clouddrive.common.metadata.constant.WorkIDConstants;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,14 +15,15 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
-@Component
+@Service
 @RocketMQMessageListener(topic = "file:download", consumerGroup = "file_consumer")
 public class FileDownloadMessageConsumer implements RocketMQListener<String> {
 
@@ -30,6 +33,8 @@ public class FileDownloadMessageConsumer implements RocketMQListener<String> {
     ObjectMapper objectMapper;
     @Autowired
     RocketMQTemplate rocketMQTemplate;
+    @Autowired
+    GetIDFeign getIDFeign;
 
     @Value("${clouddrive.save-path}")
     String fileSavePath;
@@ -40,19 +45,23 @@ public class FileDownloadMessageConsumer implements RocketMQListener<String> {
         Map<String, Object> map = objectMapper.readValue(s, new TypeReference<Map>() {
         });
 
-        String[] hash = map.get("hash").toString().split(":");
+        String[] hash = map.get("hash").toString().split("_");
         String hashFolder = hash[0];
         String fileId = hash[1];
-        File file = new File(fileSavePath + "\\" + hashFolder + "\\" + fileId);
-        String downloadId = UUID.randomUUID().toString();
+        File file = new File(Paths.get(fileSavePath, hashFolder, fileId).toString());
+        if (!file.exists()) {
+            return;
+        }
+        Long downloadId = getIDFeign.getID(WorkIDConstants.DownloadID);
         String mess = String.format("{\"hash\":\"%s\",\"FileId\":\"%s\",\"size\":\"%s\"}", hash, fileId, file.length());
 
         redisUtil.addStringAndSetTimeOut("downloadTask:" + downloadId, mess, 5);
 
         Map<String, String> re = new HashMap<>();
         re.put("hashId", map.get("hash").toString());
-        re.put("downloadId", downloadId);
-        rocketMQTemplate.asyncSend("file:downloadReturn", objectMapper.writeValueAsString(re), new SendCallback() {
+        re.put("downloadId", downloadId.toString());
+        re.put("nodeId", WorkIDConstants.NodeID.toString());
+        rocketMQTemplate.asyncSend("centre:downloadReturn", objectMapper.writeValueAsString(re), new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
                 log.info("已记录Download");

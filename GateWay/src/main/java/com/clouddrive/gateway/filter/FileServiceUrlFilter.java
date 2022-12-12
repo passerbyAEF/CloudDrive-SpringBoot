@@ -77,8 +77,6 @@ public class FileServiceUrlFilter implements GlobalFilter, Ordered {
         return balancer.choose();
     }
 
-
-
     protected URI reconstructURI(ServiceInstance serviceInstance, URI original) {
         return LoadBalancerUriTools.reconstructURI(serviceInstance, original);
     }

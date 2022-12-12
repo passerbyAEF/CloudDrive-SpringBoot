@@ -11,6 +11,7 @@ import com.clouddrive.common.security.util.UserUtil;
 import com.clouddrive.main.service.FileCoreService;
 import com.clouddrive.main.service.FileListService;
 import com.clouddrive.main.service.FileLocalService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -55,18 +56,11 @@ public class FileController extends BaseController {
         return OK(data);
     }
 
-//    @GetMapping("GetUploadFlag")
-//    ReturnMode<Object> GetUploadFlag(HttpServletResponse response, @RequestParam String flag) {
-//        return OK(fileCoreService.getUploadFlag(flag));
-//    }
-
-    @PostMapping("Download")
-    ReturnMode<Object> Download(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
-        if (!dataMap.containsKey("fileId"))
-            return Error("参数错误");
+    @GetMapping("Download")
+    ReturnMode<Object> Download(HttpServletResponse response, @RequestParam Integer fileId) {
         String flag;
         try {
-            flag = fileCoreService.Download(UserUtil.getUser(), dataMap.get("fileId"));
+            flag = fileCoreService.Download(UserUtil.getUser(), fileId);
         } catch (IOException e) {
             return Error(e.getMessage());
         }
@@ -74,7 +68,7 @@ public class FileController extends BaseController {
     }
 
     @GetMapping("GetDownloadFlag")
-    ReturnMode<Object> GetDownloadFlag(HttpServletResponse response, @RequestParam String flag) {
+    ReturnMode<Object> GetDownloadFlag(HttpServletResponse response, @RequestParam String flag) throws JsonProcessingException {
         return OK(fileCoreService.getDownloadFlag(flag));
     }
 
@@ -118,10 +112,11 @@ public class FileController extends BaseController {
 
     @PostMapping("CreateFolder")
     ReturnMode<Object> CreateFolder(HttpServletResponse response, @RequestBody @Valid CreateFolderDTO folderDTO) {
-        if (!fileLocalService.CreateFolder(UserUtil.getUser(), folderDTO.getName(), folderDTO.getParentId())) {
+        int newFolderId = fileLocalService.CreateFolder(UserUtil.getUser(), folderDTO.getName(), folderDTO.getParentId());
+        if (newFolderId == -1) {
             return Error();
         }
-        return OK();
+        return OK(newFolderId);
     }
 
     @PostMapping("MoveFolder")
