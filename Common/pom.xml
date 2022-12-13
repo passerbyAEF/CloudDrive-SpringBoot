@@ -14,10 +14,10 @@
         <module>Core</module>
         <module>Redis</module>
         <module>FileCore</module>
-        <module>RocketMQ</module>
         <module>ID</module>
         <module>MetaData</module>
         <module>Feign</module>
+        <module>RabbitMQ</module>
     </modules>
     <artifactId>Common</artifactId>
     <packaging>pom</packaging>

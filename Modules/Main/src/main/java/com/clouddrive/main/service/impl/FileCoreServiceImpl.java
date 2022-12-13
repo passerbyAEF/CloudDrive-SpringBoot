@@ -2,6 +2,7 @@ package com.clouddrive.main.service.impl;
 
 import com.clouddrive.common.filecore.domain.FileMode;
 import com.clouddrive.common.filecore.dto.DownloadDataDTO;
+import com.clouddrive.common.rabbitmq.constant.ExchangeConstant;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.feign.FileCoreFeign;
@@ -11,9 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.client.producer.SendCallback;
-import org.apache.rocketmq.client.producer.SendResult;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,14 +28,14 @@ public class FileCoreServiceImpl implements FileCoreService {
     //    @Autowired
 //    private RocketMQTemplate updateTemplate;
     @Autowired
-    private RocketMQTemplate rocketMQTemplate;
+    RabbitTemplate rabbitTemplate;
     @Autowired
-    private RedisUtil redisUtil;
+    RedisUtil redisUtil;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
     @Autowired
-    private FileMapper fileMapper;
+    FileMapper fileMapper;
 
     @Autowired
     FileCoreFeign fileCoreFeign;
@@ -82,29 +81,19 @@ public class FileCoreServiceImpl implements FileCoreService {
         String flag = fileMode.getHashId();
         Map<String, String> data = new HashMap<>();
         data.put("hash", fileMode.getHashId());
-        rocketMQTemplate.asyncSend("file:download", objectMapper.writeValueAsString(data), new SendCallback() {
-            @Override
-            public void onSuccess(SendResult sendResult) {
-            }
-
-            @Override
-            public void onException(Throwable throwable) {
-                //发送失败，不重复发送了，直接放弃
-                redisUtil.addStringAndSetTimeOut("downloadReturn:" + flag, "error", 5);
-            }
-        });
+        rabbitTemplate.convertAndSend(ExchangeConstant.FindFileExchangeName, ExchangeConstant.ReturnFindFileDataQueueName, data);
         return flag;
     }
 
     @Override
     public DownloadDataDTO getDownloadFlag(String flag) throws JsonProcessingException {
         String reStr = redisUtil.getString("downloadReturn:" + flag);
-        DownloadDataDTO data=new DownloadDataDTO();
+        DownloadDataDTO data = new DownloadDataDTO();
         if (reStr == null) {
             return data;
         }
         redisUtil.removeString("downloadReturn:" + flag);
-        Map<String,String> map=objectMapper.readValue(reStr,new TypeReference<Map>() {
+        Map<String, String> map = objectMapper.readValue(reStr, new TypeReference<Map>() {
         });
 
         data.setReady(true);

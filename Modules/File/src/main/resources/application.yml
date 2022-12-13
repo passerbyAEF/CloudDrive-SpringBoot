@@ -8,15 +8,14 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+  rabbitmq:
+    host: 172.17.0.3
+    port: 5672
+    username: guest
+    password: guest
 
 server:
   port: 5615
-
-rocketmq:
-  name-server: 172.17.0.1:9876
-  producer:
-    group: cloudDriveFileCore
-    send-message-timeout: 10000
 
 clouddrive:
   save-path: E:\file

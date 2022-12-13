@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    name: defaultDataSource
+    url: jdbc:mysql://172.17.0.1:3306/clouddrive
+    username: cloudDriveUser
+    password: 123456
+  application:
+    name: appMain
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  rabbitmq:
+    host: 172.17.0.3
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 5617
+

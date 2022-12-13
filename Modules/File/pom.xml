@@ -55,7 +55,7 @@
         </dependency>
         <dependency>
             <groupId>com.clouddrive.common</groupId>
-            <artifactId>RocketMQ</artifactId>
+            <artifactId>RabbitMQ</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -66,6 +66,11 @@
         <dependency>
             <groupId>com.clouddrive.common</groupId>
             <artifactId>MetaData</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.clouddrive.common</groupId>
+            <artifactId>RabbitMQ</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
