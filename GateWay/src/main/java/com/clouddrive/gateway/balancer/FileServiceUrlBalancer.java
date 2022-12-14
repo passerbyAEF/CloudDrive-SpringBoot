@@ -40,7 +40,7 @@ public class FileServiceUrlBalancer {
             return metadata.get("workId").equals(workId);
         }).collect(Collectors.toList());
         if (collect.size() == 0) {
-            log.warn("找不到匹配的WorkId: " + this.serviceId);
+            log.warn("找不到匹配的WorkId: " + this.workId);
             return new EmptyResponse();
         }
         return new DefaultResponse(collect.get(0));

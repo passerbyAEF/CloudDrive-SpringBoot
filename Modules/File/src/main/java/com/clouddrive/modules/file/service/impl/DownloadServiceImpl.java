@@ -32,9 +32,9 @@ public class DownloadServiceImpl implements DownloadService {
         String jsonStr = redisUtil.getString("downloadTask:" + downloadId);
         if (jsonStr == null)
             return null;
-        Map<String, Object> map = objectMapper.readValue(jsonStr, new TypeReference<Map>() {
+        Map<String, String> map = objectMapper.readValue(jsonStr, new TypeReference<Map>() {
         });
-        File file = new File(Paths.get(fileSavePath, map.get("hash").toString(), map.get("fileId").toString()).toString());
+        File file = new File(Paths.get(fileSavePath, map.get("hash"), map.get("fileId")).toString());
         if (!file.exists()) {
             return null;
         }

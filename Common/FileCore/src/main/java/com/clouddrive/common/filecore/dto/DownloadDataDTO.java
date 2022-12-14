@@ -6,5 +6,5 @@ import lombok.Data;
 public class DownloadDataDTO {
     Boolean ready = false;
     String downloadID;
-    Long nodeId;
+    String nodeId;
 }

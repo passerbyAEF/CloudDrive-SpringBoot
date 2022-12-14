@@ -43,7 +43,7 @@ class FindFileMessageConsumer {
             exchange = @Exchange(value = ExchangeConstant.FindFileExchangeName, type = ExchangeTypes.FANOUT)
     ))
     public void getData(Map<String, String> map) {
-        String[] hash = map.get("hash").toString().split("_");
+        String[] hash = map.get("hash").split("_");
         String hashFolder = hash[0];
         String fileId = hash[1];
         File file = new File(Paths.get(fileSavePath, hashFolder, fileId).toString());
@@ -51,7 +51,7 @@ class FindFileMessageConsumer {
             return;
         }
         Long downloadId = getIDFeign.getID(WorkIDConstants.DownloadID);
-        String mess = String.format("{\"hash\":\"%s\",\"FileId\":\"%s\",\"size\":\"%s\"}", hash, fileId, file.length());
+        String mess = String.format("{\"hash\":\"%s\",\"fileId\":\"%s\",\"size\":\"%s\"}", hashFolder, fileId, file.length());
 
         redisUtil.addStringAndSetTimeOut("downloadTask:" + downloadId, mess, 5);
 

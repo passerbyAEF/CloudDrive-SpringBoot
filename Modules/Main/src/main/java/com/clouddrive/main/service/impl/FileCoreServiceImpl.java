@@ -97,7 +97,7 @@ public class FileCoreServiceImpl implements FileCoreService {
         });
 
         data.setReady(true);
-        data.setNodeId(Long.parseLong(map.get("nodeId")));
+        data.setNodeId(map.get("nodeId"));
         data.setDownloadID(map.get("downloadId"));
 
         return data;

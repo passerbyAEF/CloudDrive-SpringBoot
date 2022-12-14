@@ -16,9 +16,11 @@ import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -52,12 +54,10 @@ public class FileServiceUrlFilter implements GlobalFilter, Ordered {
         }
         ServerWebExchangeUtils.addOriginalRequestUrl(exchange, url);
         String host = url.getHost();
-        MultiValueMap<String, String> headers = exchange.getRequest().getHeaders();
-        if (!headers.containsKey("nodeId")) {
-            //请求参数不包含实例id,返回503
+        String workId = getWorkId(exchange.getRequest());
+        if (!StringUtils.hasLength(workId)) {
             return Return503(exchange);
         }
-        String workId = headers.get("nodeId").get(0);
         return choose(host, workId).doOnNext((response) -> {
             URI uri = exchange.getRequest().getURI();
             String overrideScheme = null;
@@ -73,12 +73,24 @@ public class FileServiceUrlFilter implements GlobalFilter, Ordered {
     }
 
     private Mono<Response<ServiceInstance>> choose(String serviceId, String workId) {
-        FileServiceUrlBalancer balancer = new FileServiceUrlBalancer(workId, workId, this.clientFactory.getLazyProvider(serviceId, ServiceInstanceListSupplier.class));
+        FileServiceUrlBalancer balancer = new FileServiceUrlBalancer(serviceId, workId, this.clientFactory.getLazyProvider(serviceId, ServiceInstanceListSupplier.class));
         return balancer.choose();
     }
 
     protected URI reconstructURI(ServiceInstance serviceInstance, URI original) {
         return LoadBalancerUriTools.reconstructURI(serviceInstance, original);
+    }
+
+    String getWorkId(ServerHttpRequest request) {
+        MultiValueMap<String, String> queryParams = request.getQueryParams();
+        MultiValueMap<String, String> headers = request.getHeaders();
+        if (headers.containsKey("nodeId")) {
+            return headers.get("nodeId").get(0);
+        }
+        if (queryParams.containsKey("nodeId")) {
+            return queryParams.get("nodeId").get(0);
+        }
+        return null;
     }
 
     Mono<Void> Return503(ServerWebExchange exchange) {
