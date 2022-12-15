@@ -48,6 +48,9 @@ public class FileController extends BaseController {
     @PostMapping("Upload")
     ReturnMode<Object> Upload(HttpServletResponse response, @RequestBody @Valid UploadDTO uploadDTO) {
         Map<String, String> data;
+        if (uploadDTO.getSize() == 0 && fileLocalService.CreateZeroFile(UserUtil.getUser(), uploadDTO.getFolderId(), uploadDTO.getName())) {
+            return OK();
+        }
         try {
             data = fileCoreService.Upload(UserUtil.getUser(), uploadDTO.getName(), uploadDTO.getFolderId(), uploadDTO.getHash(), uploadDTO.getSize());
         } catch (IOException e) {

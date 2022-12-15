@@ -22,12 +22,12 @@ public class FileLocalServiceImpl implements FileLocalService {
     FolderMapper folderMapper;
 
     @Override
-    public boolean linkFileAndHash(Integer user, String name, Long size, Integer folderId, String hashStr) {
-        if (user == null || StringUtils.isEmpty(name) || size == null || folderId == null || StringUtils.isEmpty(hashStr)) {
+    public boolean linkFileAndHash(Integer userId, String name, Long size, Integer folderId, String hashStr) {
+        if (userId == null || StringUtils.isEmpty(name) || size == null || folderId == null || StringUtils.isEmpty(hashStr)) {
             return false;
         }
         FileMode fileMode = new FileMode();
-        fileMode.setUserId(user);
+        fileMode.setUserId(userId);
         fileMode.setHashId(hashStr);
         fileMode.setName(name);
         fileMode.setStorage(size);
@@ -85,6 +85,20 @@ public class FileLocalServiceImpl implements FileLocalService {
         file.setUpdateTime(new Date());
         file.setName(name);
         return fileMapper.updateById(file) != 0;
+    }
+
+    @Override
+    public boolean CreateZeroFile(UserMode user, int folderId, String name) {
+        FileMode fileMode = new FileMode();
+        fileMode.setUserId(user.getId());
+        fileMode.setHashId(null);
+        fileMode.setName(name);
+        fileMode.setStorage(0L);
+        fileMode.setFolderId(folderId);
+        Date now = new Date();
+        fileMode.setCreateTime(now);
+        fileMode.setUpdateTime(now);
+        return fileMapper.insert(fileMode) != 0;
     }
 
     @Override

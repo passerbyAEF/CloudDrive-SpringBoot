@@ -16,6 +16,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 @Slf4j
 @Controller
@@ -57,7 +58,7 @@ public class FileController extends BaseController {
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/octet-stream");
             response.setContentLength(fileInputStream.available());
-            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "utf-8"));
             servletOutputStream.flush();
 
             int bytesRead;
