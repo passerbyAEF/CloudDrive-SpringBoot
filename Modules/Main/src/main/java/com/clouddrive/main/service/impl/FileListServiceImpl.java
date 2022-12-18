@@ -1,5 +1,6 @@
 package com.clouddrive.main.service.impl;
 
+import com.clouddrive.common.core.constant.ScreeConstants;
 import com.clouddrive.common.filecore.domain.FileMode;
 import com.clouddrive.common.filecore.domain.FolderMode;
 import com.clouddrive.common.filecore.view.FileViewNode;
@@ -34,6 +35,44 @@ public class FileListServiceImpl implements FileListService {
         for (FileMode item : fileList) {
             if (item.getDeleteTime() == null)
                 viewList.add(new FileViewNode(item));
+        }
+        return viewList;
+    }
+
+    //最好是用缓存来优化，但是没时间写，直接力大砖飞
+    @Override
+    public List<FileViewNode> getScreeList(UserMode user, int flag) {
+        List<FileMode> fileList = fileMapper.findFileByUserId(user.getId());
+        List<FileViewNode> viewList = new ArrayList<>();
+        String i = "[\\s\\S]*";
+        switch (flag) {
+            case ScreeConstants.IMG_FLAG:
+                i += "\\.(bmp|jpg|jpeg|png|gif)$";
+                break;
+            case ScreeConstants.TEXT_FLAG:
+                i += "\\.(ppt|pptx|doc|docx|xls|xlsx|pdf|txt)$";
+                break;
+            case ScreeConstants.VIDEO_FLAG:
+                i += "\\.(mp4|avi|wmv|mpg|mpeg|mov|rm|ram|swf|flv)$";
+                break;
+            case ScreeConstants.AUDIO_FLAG:
+                i += "\\.(mp3|wav|aif|aiff|au|ra|mid|rmi|mkv)$";
+                break;
+            case ScreeConstants.OUTER_FLAG:
+            default:
+                //把上面的都包含
+                i += "\\.(bmp|jpg|jpeg|png|gif|ppt|pptx|doc|docx|xls|xlsx|pdf|txt|mp4|avi|wmv|mpg|mpeg|mov|rm|ram|swf|flv|mp3|wav|aif|aiff|au|ra|mid|rmi|mkv)$";
+                for (FileMode file : fileList) {
+                    if (file.getDeleteTime() == null && !file.getName().toLowerCase().matches(i)) {
+                        viewList.add(new FileViewNode(file));
+                    }
+                }
+                return viewList;
+        }
+        for (FileMode file : fileList) {
+            if (file.getDeleteTime() == null && file.getName().toLowerCase().matches(i)) {
+                viewList.add(new FileViewNode(file));
+            }
         }
         return viewList;
     }

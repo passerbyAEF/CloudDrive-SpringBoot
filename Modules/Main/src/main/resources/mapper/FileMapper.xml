@@ -17,6 +17,12 @@
     <select id="findFileByFolderIdAndUserId" resultMap="fileMode">
         select *
         from file_table
-        where user_id = #{arg0} and folder_id = #{arg1};
+        where user_id = #{arg0}
+          and folder_id = #{arg1};
+    </select>
+    <select id="findFileByUserId" resultMap="fileMode">
+        select *
+        from file_table
+        where user_id = #{arg0};
     </select>
 </mapper>

@@ -10,5 +10,7 @@ import java.util.List;
 public interface FileListService {
     List<FileViewNode> getList(UserMode user, int folderId);
 
+    List<FileViewNode> getScreeList(UserMode user, int flag);
+
     FolderMode getRoot(UserMode user);
 }

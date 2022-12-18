@@ -10,4 +10,6 @@ import java.util.List;
 public interface FileMapper extends BaseMapper<FileMode> {
 
     List<FileMode> findFileByFolderIdAndUserId(int userId, int folderId);
+
+    List<FileMode> findFileByUserId(int userId);
 }

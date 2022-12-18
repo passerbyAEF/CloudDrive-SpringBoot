@@ -1,5 +1,6 @@
 package com.clouddrive.main.controller;
 
+import com.clouddrive.common.core.constant.ScreeConstants;
 import com.clouddrive.common.core.controller.BaseController;
 import com.clouddrive.common.core.domain.ReturnMode;
 import com.clouddrive.common.filecore.dto.CreateFolderDTO;
@@ -37,6 +38,14 @@ public class FileController extends BaseController {
     ReturnMode<Object> List(HttpServletResponse response, @RequestParam Integer folderId) {
         UserMode user = UserUtil.getUser();
         return OK(fileListService.getList(user, folderId));
+    }
+
+    @GetMapping("ScreeList")
+    ReturnMode<Object> GetScreeList(HttpServletResponse response, @RequestParam(required = false) Integer flag) {
+        UserMode user = UserUtil.getUser();
+        if (flag == null)
+            flag = ScreeConstants.OUTER_FLAG;
+        return OK(fileListService.getScreeList(user, flag));
     }
 
     @GetMapping("GetRoot")
