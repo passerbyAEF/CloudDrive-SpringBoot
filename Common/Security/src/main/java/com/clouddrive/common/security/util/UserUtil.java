@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,6 +36,23 @@ public class UserUtil {
         if (remember) {
             cookie.setMaxAge(2592000);
         }
+        response.addCookie(cookie);
+    }
+
+    public static void deleteToken(UserMode user, HttpServletRequest request,HttpServletResponse response, RedisUtil redisUtil, ObjectMapper objectMapper) throws IOException {
+        String token = null;
+        if (request.getCookies() != null)
+            for (Cookie c : request.getCookies()) {
+                if (c.getName().equals("Token"))
+                    token = c.getValue();
+            }
+        if (token != null) {
+            String uuid = JwtUtil.getUUID(token);
+            redisUtil.removeString(uuid);
+
+        }
+        Cookie cookie = new Cookie("Token", null);
+        cookie.setPath("/");
         response.addCookie(cookie);
     }
 }

@@ -11,11 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -56,5 +54,12 @@ public class LoginController extends BaseController {
         }
         UserUtil.setToken(userMode, response, remember, redisUtil, objectMapper);
         GoToUrl(response, UrlStatus.ROOT_URL);
+    }
+
+    @GetMapping("loginOut")
+    void LoginOut(HttpServletResponse response, HttpServletRequest request) throws IOException {
+        UserMode user = UserUtil.getUser();
+        UserUtil.deleteToken(user, request,response, redisUtil, objectMapper);
+        GoToUrl(response, UrlStatus.LOGIN_URL);
     }
 }
