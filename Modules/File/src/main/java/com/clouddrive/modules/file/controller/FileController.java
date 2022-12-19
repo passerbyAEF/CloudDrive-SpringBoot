@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.yaml.snakeyaml.util.UriEncoder;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
 
 @Slf4j
 @Controller
@@ -58,7 +58,7 @@ public class FileController extends BaseController {
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/octet-stream");
             response.setContentLength(fileInputStream.available());
-            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "utf-8"));
+            response.setHeader("Content-Disposition", "attachment; filename=" + UriEncoder.encode(fileName));
             servletOutputStream.flush();
 
             int bytesRead;
