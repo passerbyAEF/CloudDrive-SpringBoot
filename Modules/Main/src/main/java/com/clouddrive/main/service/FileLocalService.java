@@ -17,6 +17,8 @@ public interface FileLocalService {
 
     boolean CreateZeroFile(UserMode user, int folderId, String name);
 
+    boolean RecoveryFile(UserMode user, int fileId);
+
     int CreateFolder(UserMode user, String name, int inFolderId);
 
     boolean MoveFolder(UserMode user, int folderId, int toFolderId);

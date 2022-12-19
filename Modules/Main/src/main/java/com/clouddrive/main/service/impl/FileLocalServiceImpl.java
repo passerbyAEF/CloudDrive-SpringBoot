@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class FileLocalServiceImpl implements FileLocalService {
@@ -99,6 +100,15 @@ public class FileLocalServiceImpl implements FileLocalService {
         fileMode.setCreateTime(now);
         fileMode.setUpdateTime(now);
         return fileMapper.insert(fileMode) != 0;
+    }
+
+    @Override
+    public boolean RecoveryFile(UserMode user, int fileId) {
+        FileMode file = fileMapper.selectById(fileId);
+        if (!file.getUserId().equals(user.getId())) {
+            return false;
+        }
+        return fileMapper.setFileDeleteTime(file.getId(),new Date()) != 0;
     }
 
     @Override

@@ -12,5 +12,7 @@ public interface FileListService {
 
     List<FileViewNode> getScreeList(UserMode user, int flag);
 
+    List<FileViewNode> getRecycleList(UserMode user);
+
     FolderMode getRoot(UserMode user);
 }

@@ -16,12 +16,14 @@
         select *
         from folder_table
         where parent_id = #{arg1}
-          and owner_id = #{arg0};
+          and owner_id = #{arg0}
+          and delete_time is null;
     </select>
     <select id="findFolderByParentId" resultMap="folderMode">
         select *
         from folder_table
-        where parent_id = #{arg1};
+        where parent_id = #{arg1}
+          and delete_time is null;
     </select>
     <select id="findRootFolderId" resultMap="folderMode">
         select *

@@ -18,11 +18,26 @@
         select *
         from file_table
         where user_id = #{arg0}
+          and delete_time is null
           and folder_id = #{arg1};
     </select>
     <select id="findFileByUserId" resultMap="fileMode">
         select *
         from file_table
-        where user_id = #{arg0};
+        where user_id = #{arg0}
+          and delete_time is null;
     </select>
+    <select id="findDeleteFileInLastTime" resultMap="fileMode">
+        select *
+        from file_table
+        where user_id = #{arg0}
+          and delete_time is not null
+          and delete_time > #{arg1};
+    </select>
+    <update id="setFileDeleteTime">
+        update file_table
+        set delete_time = null,
+            update_time= #{arg1}
+        where id = #{arg0};
+    </update>
 </mapper>

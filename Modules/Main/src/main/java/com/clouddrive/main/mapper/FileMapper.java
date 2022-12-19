@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.clouddrive.common.filecore.domain.FileMode;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -12,4 +13,8 @@ public interface FileMapper extends BaseMapper<FileMode> {
     List<FileMode> findFileByFolderIdAndUserId(int userId, int folderId);
 
     List<FileMode> findFileByUserId(int userId);
+
+    List<FileMode> findDeleteFileInLastTime(int userId,Date time);
+
+    int setFileDeleteTime(int fileId,Date time);
 }

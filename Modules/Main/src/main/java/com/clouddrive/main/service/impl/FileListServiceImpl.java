@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -29,12 +30,10 @@ public class FileListServiceImpl implements FileListService {
         List<FileViewNode> viewList = new ArrayList<>();
         for (FolderMode item : folderList) {
             //非null代表没有进行删除
-            if (item.getDeleteTime() == null)
-                viewList.add(new FileViewNode(item));
+            viewList.add(new FileViewNode(item));
         }
         for (FileMode item : fileList) {
-            if (item.getDeleteTime() == null)
-                viewList.add(new FileViewNode(item));
+            viewList.add(new FileViewNode(item));
         }
         return viewList;
     }
@@ -63,16 +62,28 @@ public class FileListServiceImpl implements FileListService {
                 //把上面的都包含
                 i += "\\.(bmp|jpg|jpeg|png|gif|ppt|pptx|doc|docx|xls|xlsx|pdf|txt|mp4|avi|wmv|mpg|mpeg|mov|rm|ram|swf|flv|mp3|wav|aif|aiff|au|ra|mid|rmi|mkv)$";
                 for (FileMode file : fileList) {
-                    if (file.getDeleteTime() == null && !file.getName().toLowerCase().matches(i)) {
+                    if (!file.getName().toLowerCase().matches(i)) {
                         viewList.add(new FileViewNode(file));
                     }
                 }
                 return viewList;
         }
         for (FileMode file : fileList) {
-            if (file.getDeleteTime() == null && file.getName().toLowerCase().matches(i)) {
+            if (file.getName().toLowerCase().matches(i)) {
                 viewList.add(new FileViewNode(file));
             }
+        }
+        return viewList;
+    }
+
+    @Override
+    public List<FileViewNode> getRecycleList(UserMode user) {
+        Calendar ca = Calendar.getInstance();
+        ca.add(Calendar.DAY_OF_YEAR, -30);
+        List<FileMode> fileList = fileMapper.findDeleteFileInLastTime(user.getId(), ca.getTime());
+        List<FileViewNode> viewList = new ArrayList<>();
+        for (FileMode item : fileList) {
+            viewList.add(new FileViewNode(item));
         }
         return viewList;
     }
