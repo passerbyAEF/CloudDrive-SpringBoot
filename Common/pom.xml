@@ -18,6 +18,7 @@
         <module>MetaData</module>
         <module>Feign</module>
         <module>RabbitMQ</module>
+        <module>Mail</module>
     </modules>
     <artifactId>Common</artifactId>
     <packaging>pom</packaging>

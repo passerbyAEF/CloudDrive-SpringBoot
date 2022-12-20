@@ -67,10 +67,13 @@
             <artifactId>redis</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-    </dependencies>
 
-    <dependencyManagement>
-    </dependencyManagement>
+        <dependency>
+            <groupId>com.clouddrive.common</groupId>
+            <artifactId>Mail</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
