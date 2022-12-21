@@ -96,6 +96,6 @@ public class AuthFilter implements GlobalFilter, Ordered {
     }
 
     boolean matches(String path) {
-        return !path.matches("(/api/auth/login|/api/auth/register)") && path.matches("/api/[\\s\\S]*");
+        return !path.matches("(/api/auth/login|/api/auth/register|/api/auth/mailCode/[\\s\\S]*)") && path.matches("/api/[\\s\\S]*");
     }
 }

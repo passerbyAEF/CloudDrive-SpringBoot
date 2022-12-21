@@ -1,1 +1,1 @@
-com.clouddrive.common.rabbitmq.config.MailUtil
+com.clouddrive.common.mail.util.MailUtil

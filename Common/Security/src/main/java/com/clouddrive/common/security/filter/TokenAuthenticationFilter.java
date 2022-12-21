@@ -4,6 +4,7 @@ import com.clouddrive.common.core.util.JwtUtil;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.common.security.domain.UserMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,8 +36,16 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                     token = c.getValue();
             }
         if (token != null) {
+            String uuid;
             //如果有Token
-            String uuid = JwtUtil.getUUID(token);
+            try {
+                uuid = JwtUtil.getUUID(token);
+            } catch (JwtException e) {
+                SecurityContextHolder.getContext().setAuthentication(getAnonymousAuthentication());
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             String str = redisUtil.getString(uuid);
             if (str != null) {
                 //如果Redis中存放着Token，就提取出缓存在Redis中的用户信息
