@@ -1,8 +1,9 @@
 package com.clouddrive.modules.file.service.impl;
 
 import com.clouddrive.common.core.flag.FileUploadState;
+import com.clouddrive.common.id.constant.WorkIDConstants;
 import com.clouddrive.common.id.feign.GetIDFeign;
-import com.clouddrive.common.metadata.constant.WorkIDConstants;
+import com.clouddrive.common.metadata.constant.NodeIDConstants;
 import com.clouddrive.common.redis.util.RedisUtil;
 import com.clouddrive.modules.file.feign.MainServiceFeign;
 import com.clouddrive.modules.file.service.UploadService;
@@ -153,7 +154,7 @@ public class UploadServiceImpl implements UploadService {
         Long uploadId = getIDFeign.getID(WorkIDConstants.UploadID);
         Map<String, String> reMap = new HashMap<>();
         reMap.put("uploadId", uploadId.toString());
-        reMap.put("nodeId", WorkIDConstants.NodeID.toString());
+        reMap.put("nodeId", NodeIDConstants.NodeID.toString());
 
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("hash", hash);

@@ -1,15 +1,12 @@
 package com.clouddrive.modules.file.rocketmq;
 
+import com.clouddrive.common.id.constant.WorkIDConstants;
 import com.clouddrive.common.id.feign.GetIDFeign;
-import com.clouddrive.common.metadata.constant.WorkIDConstants;
+import com.clouddrive.common.metadata.constant.NodeIDConstants;
 import com.clouddrive.common.rabbitmq.constant.ExchangeConstant;
 import com.clouddrive.common.redis.util.RedisUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.ExchangeTypes;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -58,7 +55,7 @@ class FindFileMessageConsumer {
         Map<String, String> re = new HashMap<>();
         re.put("hashId", map.get("hash").toString());
         re.put("downloadId", downloadId.toString());
-        re.put("nodeId", WorkIDConstants.NodeID.toString());
+        re.put("nodeId", NodeIDConstants.NodeID.toString());
         rabbitTemplate.convertAndSend(ExchangeConstant.ReturnFindFileDataExchangeName,"",re);
         log.info("已记录Download");
         log.info(downloadId + "已发送");
