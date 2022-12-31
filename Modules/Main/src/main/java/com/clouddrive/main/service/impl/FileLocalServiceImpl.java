@@ -1,18 +1,20 @@
 package com.clouddrive.main.service.impl;
 
+import com.clouddrive.common.core.exception.TransactionalException;
 import com.clouddrive.common.filecore.domain.FileMode;
 import com.clouddrive.common.filecore.domain.FolderMode;
 import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
+import com.clouddrive.main.mapper.UserMapper;
 import com.clouddrive.main.service.FileLocalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class FileLocalServiceImpl implements FileLocalService {
@@ -21,11 +23,14 @@ public class FileLocalServiceImpl implements FileLocalService {
     FileMapper fileMapper;
     @Autowired
     FolderMapper folderMapper;
+    @Autowired
+    UserMapper userMapper;
 
+    @Transactional
     @Override
-    public boolean linkFileAndHash(Integer userId, String name, Long size, Integer folderId, String hashStr) {
+    public void linkFileAndHash(Integer userId, String name, Long size, Integer folderId, String hashStr) {
         if (userId == null || StringUtils.isEmpty(name) || size == null || folderId == null || StringUtils.isEmpty(hashStr)) {
-            return false;
+            throw new TransactionalException("参数错误");
         }
         FileMode fileMode = new FileMode();
         fileMode.setUserId(userId);
@@ -36,7 +41,27 @@ public class FileLocalServiceImpl implements FileLocalService {
         Date now = new Date();
         fileMode.setCreateTime(now);
         fileMode.setUpdateTime(now);
-        return fileMapper.insert(fileMode) != 0;
+        if (fileMapper.insert(fileMode) == 0) {
+            throw new TransactionalException("SQL错误");
+        }
+        //获取最新数据
+        UserMode user = userMapper.selectById(userId);
+        user.setStorage(user.getStorage() + size);
+        if (userMapper.updateById(user) == 0) {
+            throw new TransactionalException("SQL错误");
+        }
+    }
+
+    @Override
+    public long GetStorage(Integer userId) {
+        UserMode user = userMapper.selectById(userId);
+        return user.getStorage();
+    }
+
+    @Override
+    public long GetMaxStorage(Integer userId) {
+        UserMode user = userMapper.selectById(userId);
+        return user.getMaxStorage();
     }
 
     @Override
@@ -51,8 +76,9 @@ public class FileLocalServiceImpl implements FileLocalService {
         return fileMapper.updateById(file) != 0;
     }
 
+    @Transactional
     @Override
-    public boolean CopyFile(UserMode user, int fileId, int toFolderId) {
+    public void CopyFile(UserMode user, int fileId, int toFolderId) {
         FileMode file = fileMapper.selectById(fileId);
         FileMode newFile = new FileMode();
         newFile.setName(file.getName());
@@ -63,18 +89,35 @@ public class FileLocalServiceImpl implements FileLocalService {
         Date now = new Date();
         newFile.setCreateTime(now);
         newFile.setUpdateTime(now);
-        return fileMapper.insert(newFile) != 0;
+        if (fileMapper.insert(newFile) == 0) {
+            throw new TransactionalException("SQL错误");
+        }
+        //获取最新数据
+        user=userMapper.selectById(user.getId());
+        user.setStorage(user.getStorage() + newFile.getStorage());
+        if (userMapper.updateById(user) == 0) {
+            throw new TransactionalException("SQL错误");
+        }
     }
 
+    @Transactional
     @Override
-    public boolean DeleteFile(UserMode user, int fileId) {
+    public void DeleteFile(UserMode user, int fileId) {
         FileMode file = fileMapper.selectById(fileId);
         if (file == null || !file.getUserId().equals(user.getId())) {
-            return false;
+            return;
         }
         file.setUpdateTime(new Date());
         file.setDeleteTime(new Date());
-        return fileMapper.updateById(file) != 0;
+        if (fileMapper.updateById(file) == 0) {
+            throw new TransactionalException("SQL错误");
+        }
+        //获取最新数据
+        user=userMapper.selectById(user.getId());
+        user.setStorage(user.getStorage() - file.getStorage());
+        if (userMapper.updateById(user) == 0) {
+            throw new TransactionalException("SQL错误");
+        }
     }
 
     @Override
@@ -108,7 +151,7 @@ public class FileLocalServiceImpl implements FileLocalService {
         if (!file.getUserId().equals(user.getId())) {
             return false;
         }
-        return fileMapper.setFileDeleteTime(file.getId(),new Date()) != 0;
+        return fileMapper.setFileDeleteTime(file.getId(), new Date()) != 0;
     }
 
     @Override
@@ -157,7 +200,6 @@ public class FileLocalServiceImpl implements FileLocalService {
         FolderMode folder = folderMapper.selectById(folderId);
         FolderMode newFolder = new FolderMode();
         newFolder.setName(folder.getName());
-        //newFolder.setParentId(toFolderId);
         newFolder.setOwnerId(user.getId());
         Date now = new Date();
         newFolder.setCreateTime(now);

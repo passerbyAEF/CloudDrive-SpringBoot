@@ -91,7 +91,12 @@ public class RegisterController extends BaseController {
         String s = redisUtil.getString("registerCode:" + code);
         if (s != null) {
             UserMode user = objectMapper.readValue(s, UserMode.class);
-            if (!userService.register(user)) set500(response);
+            try{
+                userService.register(user);
+            }catch (RuntimeException e){
+                set500(response);
+                return;
+            }
             UserUtil.setToken(user, response, false, redisUtil, objectMapper);
             GoToUrl(response, UrlStatus.ROOT_URL);
         } else

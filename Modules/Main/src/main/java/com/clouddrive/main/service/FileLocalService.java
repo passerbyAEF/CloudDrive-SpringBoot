@@ -5,13 +5,17 @@ import com.clouddrive.common.security.domain.UserMode;
 //主要承接不需要与文件中心交换数据的，只涉及到本地数据库修改的操作
 public interface FileLocalService {
 
-    boolean linkFileAndHash(Integer user, String name, Long size, Integer folderId, String hashStr);
+    void linkFileAndHash(Integer user, String name, Long size, Integer folderId, String hashStr);
+
+    long GetStorage(Integer userId);
+
+    long GetMaxStorage(Integer userId);
 
     boolean MoveFile(UserMode user, int fileId, int toFolderId);
 
-    boolean CopyFile(UserMode user, int fileId, int toFolderId);
+    void CopyFile(UserMode user, int fileId, int toFolderId);
 
-    boolean DeleteFile(UserMode user, int fileId);
+    void DeleteFile(UserMode user, int fileId);
 
     boolean RenameFile(UserMode user, int fileId, String name);
 

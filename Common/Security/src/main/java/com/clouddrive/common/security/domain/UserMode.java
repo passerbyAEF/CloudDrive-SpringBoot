@@ -30,6 +30,7 @@ public class UserMode implements UserDetails {
     Date deleteTime;
     String auth;
     Long storage;
+    Long maxStorage;
 
     @JsonIgnore
     @Override

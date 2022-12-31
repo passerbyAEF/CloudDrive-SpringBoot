@@ -40,6 +40,18 @@ public class FileController extends BaseController {
         return OK(fileListService.getList(user, folderId));
     }
 
+    @GetMapping("GetStorage")
+    ReturnMode<Object> GetStorage(HttpServletResponse response) {
+        UserMode user = UserUtil.getUser();
+        return OK(fileLocalService.GetStorage(user.getId()));
+    }
+
+    @GetMapping("GetMaxStorage")
+    ReturnMode<Object> GetMaxStorage(HttpServletResponse response) {
+        UserMode user = UserUtil.getUser();
+        return OK(fileLocalService.GetMaxStorage(user.getId()));
+    }
+
     @GetMapping("ScreeList")
     ReturnMode<Object> GetScreeList(HttpServletResponse response, @RequestParam(required = false) Integer flag) {
         UserMode user = UserUtil.getUser();
@@ -47,8 +59,6 @@ public class FileController extends BaseController {
             flag = ScreeConstants.OUTER_FLAG;
         return OK(fileListService.getScreeList(user, flag));
     }
-
-
 
     @GetMapping("GetRoot")
     ReturnMode<Object> GetRoot(HttpServletResponse response) {
@@ -100,7 +110,9 @@ public class FileController extends BaseController {
     ReturnMode<Object> CopyFile(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("fileId") && !dataMap.containsKey("toFolderId"))
             return Error("参数错误");
-        if (!fileLocalService.CopyFile(UserUtil.getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"))) {
+        try {
+            fileLocalService.CopyFile(UserUtil.getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"));
+        } catch (RuntimeException e) {
             return Error();
         }
         return OK();
@@ -110,7 +122,9 @@ public class FileController extends BaseController {
     ReturnMode<Object> DeleteFile(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("fileId"))
             return Error("参数错误");
-        if (!fileLocalService.DeleteFile(UserUtil.getUser(), dataMap.get("fileId"))) {
+        try {
+            fileLocalService.DeleteFile(UserUtil.getUser(), dataMap.get("fileId"));
+        } catch (RuntimeException e) {
             return Error();
         }
         return OK();

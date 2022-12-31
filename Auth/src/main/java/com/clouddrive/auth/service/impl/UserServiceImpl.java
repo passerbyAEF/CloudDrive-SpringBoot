@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.clouddrive.auth.mapper.FolderMapper;
 import com.clouddrive.auth.mapper.UserMapper;
 import com.clouddrive.auth.service.UserService;
+import com.clouddrive.common.core.exception.TransactionalException;
 import com.clouddrive.common.filecore.domain.FolderMode;
 import com.clouddrive.common.security.domain.UserMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserMode> implement
     @Override
     public Boolean register(UserMode user) {
         if (userMapper.insert(user) != 1) {
-            return false;
+            throw new TransactionalException("SQL执行错误");
         }
         FolderMode folder = new FolderMode();
         folder.setName(".");
@@ -40,7 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserMode> implement
         Date now = new Date();
         folder.setCreateTime(now);
         folder.setUpdateTime(now);
-        folderMapper.insert(folder);
+        if (folderMapper.insert(folder) != 1) {
+            throw new TransactionalException("SQL执行错误");
+        }
         return true;
     }
 }

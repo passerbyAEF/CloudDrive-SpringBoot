@@ -43,7 +43,9 @@ public class InternalController extends BaseController {
         Long size = Long.valueOf(fileLocalDataMap.get("size").toString());
 
         //数据持久化
-        if (!fileLocalService.linkFileAndHash(user, name, size, folderId, fileId)) {
+        try {
+            fileLocalService.linkFileAndHash(user, name, size, folderId, fileId);
+        } catch (RuntimeException e) {
             //持久化失败
             return false;
         }
