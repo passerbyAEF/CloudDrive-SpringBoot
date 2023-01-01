@@ -21,6 +21,12 @@
           and delete_time is null
           and folder_id = #{arg1};
     </select>
+    <select id="findFileByFolderId" resultMap="fileMode">
+        select *
+        from file_table
+        where delete_time is null
+          and folder_id = #{arg1};
+    </select>
     <select id="findFileByUserId" resultMap="fileMode">
         select *
         from file_table

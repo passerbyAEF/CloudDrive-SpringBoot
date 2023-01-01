@@ -3,6 +3,8 @@ package com.clouddrive.main.controller;
 import com.clouddrive.common.core.constant.ScreeConstants;
 import com.clouddrive.common.core.controller.BaseController;
 import com.clouddrive.common.core.domain.ReturnMode;
+import com.clouddrive.common.core.exception.AuthException;
+import com.clouddrive.common.core.exception.SQLException;
 import com.clouddrive.common.filecore.dto.CreateFolderDTO;
 import com.clouddrive.common.filecore.dto.RenameFileDTO;
 import com.clouddrive.common.filecore.dto.RenameFolderDTO;
@@ -112,8 +114,10 @@ public class FileController extends BaseController {
             return Error("参数错误");
         try {
             fileLocalService.CopyFile(UserUtil.getUser(), dataMap.get("fileId"), dataMap.get("toFolderId"));
-        } catch (RuntimeException e) {
+        } catch (SQLException e) {
             return Error();
+        } catch (AuthException e) {
+            return Error(e.getMessage());
         }
         return OK();
     }
@@ -124,8 +128,10 @@ public class FileController extends BaseController {
             return Error("参数错误");
         try {
             fileLocalService.DeleteFile(UserUtil.getUser(), dataMap.get("fileId"));
-        } catch (RuntimeException e) {
+        } catch (SQLException e) {
             return Error();
+        } catch (AuthException e) {
+            return Error(e.getMessage());
         }
         return OK();
     }
@@ -164,8 +170,12 @@ public class FileController extends BaseController {
     ReturnMode<Object> CopyFolder(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("folderId") && !dataMap.containsKey("toFolderId"))
             return Error("参数错误");
-        if (!fileLocalService.CopyFolder(UserUtil.getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"))) {
+        try {
+            fileLocalService.CopyFolder(UserUtil.getUser(), dataMap.get("folderId"), dataMap.get("toFolderId"));
+        } catch (SQLException e) {
             return Error();
+        } catch (AuthException e) {
+            return Error(e.getMessage());
         }
         return OK();
     }
@@ -174,8 +184,12 @@ public class FileController extends BaseController {
     ReturnMode<Object> DeleteFolder(HttpServletResponse response, @RequestBody Map<String, Integer> dataMap) {
         if (!dataMap.containsKey("folderId"))
             return Error("参数错误");
-        if (!fileLocalService.DeleteFolder(UserUtil.getUser(), dataMap.get("folderId"))) {
+        try {
+            fileLocalService.DeleteFolder(UserUtil.getUser(), dataMap.get("folderId"));
+        } catch (SQLException e) {
             return Error();
+        } catch (AuthException e) {
+            return Error(e.getMessage());
         }
         return OK();
     }

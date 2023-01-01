@@ -31,4 +31,11 @@
         where owner_id = #{arg1}
           and parent_id is NULL limit 1;
     </select>
+    <select id="findDeleteFolderInLastTime" resultMap="folderMode">
+        select *
+        from folder_table
+        where owner_id = #{arg0}
+          and delete_time is not null
+          and delete_time > #{arg1};
+    </select>
 </mapper>

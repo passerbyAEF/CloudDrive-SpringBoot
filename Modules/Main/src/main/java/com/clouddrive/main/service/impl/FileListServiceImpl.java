@@ -81,8 +81,12 @@ public class FileListServiceImpl implements FileListService {
         Calendar ca = Calendar.getInstance();
         ca.add(Calendar.DAY_OF_YEAR, -30);
         List<FileMode> fileList = fileMapper.findDeleteFileInLastTime(user.getId(), ca.getTime());
+        List<FolderMode> folderList = folderMapper.findDeleteFolderInLastTime(user.getId(), ca.getTime());
         List<FileViewNode> viewList = new ArrayList<>();
         for (FileMode item : fileList) {
+            viewList.add(new FileViewNode(item));
+        }
+        for (FolderMode item : folderList) {
             viewList.add(new FileViewNode(item));
         }
         return viewList;

@@ -27,11 +27,11 @@ public interface FileLocalService {
 
     boolean MoveFolder(UserMode user, int folderId, int toFolderId);
 
-    boolean CopyFolder(UserMode user, int folderId, int toFolderId);
+    void CopyFolder(UserMode user, int folderId, int toFolderId);
 
     boolean isChild(int folderId, int toFolderId);
 
-    boolean DeleteFolder(UserMode user, int folderId);
+    void DeleteFolder(UserMode user, int folderId);
 
     boolean RenameFolder(UserMode user, int folderId, String name);
 }
