@@ -16,7 +16,5 @@ public interface FileMapper extends BaseMapper<FileMode> {
 
     List<FileMode> findFileByUserId(int userId);
 
-    List<FileMode> findDeleteFileInLastTime(int userId,Date time);
-
-    int setFileDeleteTime(int fileId,Date time);
+    List<FileMode> findRecycleFileInLastTime(int userId,Date time);
 }

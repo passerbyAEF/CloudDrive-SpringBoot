@@ -8,6 +8,7 @@
         <result property="name" column="name"/>
         <result property="ownerId" column="owner_id"/>
         <result property="parentId" column="parent_id"/>
+        <result property="isRecycle" column="is_recycle"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="deleteTime" column="delete_time"/>
@@ -17,25 +18,29 @@
         from folder_table
         where parent_id = #{arg1}
           and owner_id = #{arg0}
+          and is_recycle = 0
           and delete_time is null;
     </select>
     <select id="findFolderByParentId" resultMap="folderMode">
         select *
         from folder_table
         where parent_id = #{arg1}
+          and is_recycle = 0
           and delete_time is null;
     </select>
     <select id="findRootFolderId" resultMap="folderMode">
         select *
         from folder_table
         where owner_id = #{arg1}
+          and is_recycle = 0
           and parent_id is NULL limit 1;
     </select>
-    <select id="findDeleteFolderInLastTime" resultMap="folderMode">
+    <select id="findRecycleFolderInLastTime" resultMap="folderMode">
         select *
         from folder_table
         where owner_id = #{arg0}
-          and delete_time is not null
-          and delete_time > #{arg1};
+          and delete_time is null
+          and is_recycle = 1
+          and update_time > #{arg1};
     </select>
 </mapper>

@@ -10,6 +10,7 @@
         <result property="hashId" column="hash_id"/>
         <result property="userId" column="user_id"/>
         <result property="storage" column="storage"/>
+        <result property="isRecycle" column="is_recycle"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="deleteTime" column="delete_time"/>
@@ -19,31 +20,29 @@
         from file_table
         where user_id = #{arg0}
           and delete_time is null
+          and is_recycle = 0
           and folder_id = #{arg1};
     </select>
     <select id="findFileByFolderId" resultMap="fileMode">
         select *
         from file_table
         where delete_time is null
+          and is_recycle = 0
           and folder_id = #{arg1};
     </select>
     <select id="findFileByUserId" resultMap="fileMode">
         select *
         from file_table
         where user_id = #{arg0}
+          and is_recycle = 0
           and delete_time is null;
     </select>
-    <select id="findDeleteFileInLastTime" resultMap="fileMode">
+    <select id="findRecycleFileInLastTime" resultMap="fileMode">
         select *
         from file_table
         where user_id = #{arg0}
-          and delete_time is not null
-          and delete_time > #{arg1};
+          and delete_time is null
+          and is_recycle = 1
+          and update_time > #{arg1};
     </select>
-    <update id="setFileDeleteTime">
-        update file_table
-        set delete_time = null,
-            update_time= #{arg1}
-        where id = #{arg0};
-    </update>
 </mapper>

@@ -4,6 +4,7 @@ import com.clouddrive.common.core.exception.AuthException;
 import com.clouddrive.common.core.exception.TransactionalException;
 import com.clouddrive.common.filecore.domain.FileMode;
 import com.clouddrive.common.filecore.domain.FolderMode;
+import com.clouddrive.common.filecore.dto.RecycleDTO;
 import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.naming.AuthenticationException;
 import java.util.Date;
 import java.util.List;
 
@@ -46,12 +46,7 @@ public class FileLocalServiceImpl implements FileLocalService {
         if (fileMapper.insert(fileMode) == 0) {
             throw new TransactionalException("SQL错误");
         }
-        //获取最新数据
-        UserMode user = userMapper.selectById(userId);
-        user.setStorage(user.getStorage() + size);
-        if (userMapper.updateById(user) == 0) {
-            throw new TransactionalException("SQL错误");
-        }
+        addStorage(userId, size);
     }
 
     @Override
@@ -97,12 +92,7 @@ public class FileLocalServiceImpl implements FileLocalService {
         if (fileMapper.insert(newFile) == 0) {
             throw new TransactionalException("SQL错误");
         }
-        //获取最新数据
-        user = userMapper.selectById(user.getId());
-        user.setStorage(user.getStorage() + newFile.getStorage());
-        if (userMapper.updateById(user) == 0) {
-            throw new TransactionalException("SQL错误");
-        }
+        addStorage(user.getId(), newFile.getStorage());
     }
 
     @Transactional
@@ -112,17 +102,13 @@ public class FileLocalServiceImpl implements FileLocalService {
         if (file == null || !file.getUserId().equals(user.getId())) {
             throw new AuthException();
         }
+        file.setIsRecycle(true);
         file.setUpdateTime(new Date());
-        file.setDeleteTime(new Date());
+//        file.setDeleteTime(new Date());
         if (fileMapper.updateById(file) == 0) {
             throw new TransactionalException("SQL错误");
         }
-        //获取最新数据
-        user = userMapper.selectById(user.getId());
-        user.setStorage(user.getStorage() - file.getStorage());
-        if (userMapper.updateById(user) == 0) {
-            throw new TransactionalException("SQL错误");
-        }
+        addStorage(user.getId(), -file.getStorage());
     }
 
     @Override
@@ -150,13 +136,67 @@ public class FileLocalServiceImpl implements FileLocalService {
         return fileMapper.insert(fileMode) != 0;
     }
 
+    @Transactional
     @Override
-    public boolean RecoveryFile(UserMode user, int fileId) {
-        FileMode file = fileMapper.selectById(fileId);
-        if (!file.getUserId().equals(user.getId())) {
-            return false;
+    public void RecoveryRecycle(UserMode user, List<RecycleDTO> data) {
+        for (RecycleDTO item : data) {
+            if (item.getIsFile()) {
+                FileMode file = fileMapper.selectById(item.getId());
+                if (!file.getUserId().equals(user.getId())) {
+                    throw new AuthException();
+                }
+                file.setIsRecycle(false);
+                file.setUpdateTime(new Date());
+                file.setDeleteTime(null);
+                if (fileMapper.updateById(file) == 0) {
+                    throw new TransactionalException("SQL错误");
+                }
+                addStorage(user.getId(), file.getStorage());
+            } else {
+                FolderMode folder = folderMapper.selectById(item.getId());
+                if (!folder.getOwnerId().equals(user.getId())) {
+                    throw new AuthException();
+                }
+                folder.setIsRecycle(false);
+                folder.setUpdateTime(new Date());
+                folder.setDeleteTime(null);
+                if (folderMapper.updateById(folder) == 0) {
+                    throw new TransactionalException("SQL错误");
+                }
+                addStorage(user.getId(), getFolderSize(folder.getId()));
+            }
         }
-        return fileMapper.setFileDeleteTime(file.getId(), new Date()) != 0;
+    }
+
+    @Override
+    public void DeleteRecycle(UserMode user, List<RecycleDTO> data) {
+        for (RecycleDTO item : data) {
+            if (item.getIsFile()) {
+                FileMode file = fileMapper.selectById(item.getId());
+                if (!file.getUserId().equals(user.getId())) {
+                    throw new AuthException();
+                }
+                Date now = new Date();
+                file.setUpdateTime(now);
+                file.setDeleteTime(now);
+                if (fileMapper.updateById(file) == 0) {
+                    throw new TransactionalException("SQL错误");
+                }
+                addStorage(user.getId(), file.getStorage());
+            } else {
+                FolderMode folder = folderMapper.selectById(item.getId());
+                if (!folder.getOwnerId().equals(user.getId())) {
+                    throw new AuthException();
+                }
+                Date now = new Date();
+                folder.setUpdateTime(now);
+                folder.setDeleteTime(now);
+                if (folderMapper.updateById(folder) == 0) {
+                    throw new TransactionalException("SQL错误");
+                }
+                addStorage(user.getId(), getFolderSize(folder.getId()));
+            }
+        }
     }
 
     @Override
@@ -225,12 +265,35 @@ public class FileLocalServiceImpl implements FileLocalService {
         if (folderMapper.updateById(newFolder) == 0) {
             throw new TransactionalException("SQL错误");
         }
-        long size = getFolderSize(newFolder.getId());
-        user = userMapper.selectById(user.getId());
-        user.setStorage(user.getStorage() + size);
-        if (userMapper.updateById(user) == 0) {
+
+        addStorage(user.getId(), getFolderSize(newFolder.getId()));
+    }
+
+    @Transactional
+    @Override
+    public void DeleteFolder(UserMode user, int folderId) {
+        FolderMode folder = folderMapper.selectById(folderId);
+        if (folder == null || !folder.getOwnerId().equals(user.getId())) {
+            throw new AuthException();
+        }
+        folder.setIsRecycle(true);
+        Date now = new Date();
+        folder.setUpdateTime(now);
+        if (folderMapper.updateById(folder) == 0) {
             throw new TransactionalException("SQL错误");
         }
+        addStorage(user.getId(), -getFolderSize(folderId));
+    }
+
+    @Override
+    public boolean RenameFolder(UserMode user, int folderId, String name) {
+        FolderMode folder = folderMapper.selectById(folderId);
+        if (folder == null || !folder.getOwnerId().equals(user.getId())) {
+            return false;
+        }
+        folder.setName(name);
+        folder.setUpdateTime(new Date());
+        return folderMapper.updateById(folder) != 0;
     }
 
     private int copyFolderNode(UserMode user, int folderId, int toFolderId) {
@@ -268,35 +331,11 @@ public class FileLocalServiceImpl implements FileLocalService {
         return size;
     }
 
-    @Transactional
-    @Override
-    public void DeleteFolder(UserMode user, int folderId) {
-        FolderMode folder = folderMapper.selectById(folderId);
-        if (folder == null || !folder.getOwnerId().equals(user.getId())) {
-            throw new AuthException();
-        }
-        Date now = new Date();
-        folder.setUpdateTime(now);
-        folder.setDeleteTime(now);
-        if (folderMapper.updateById(folder) == 0) {
-            throw new TransactionalException("SQL错误");
-        }
-
-        user = userMapper.selectById(user.getId());
-        user.setStorage(user.getStorage() - getFolderSize(folderId));
+    private void addStorage(int userId, long size) {
+        UserMode user = userMapper.selectById(userId);
+        user.setStorage(user.getStorage() + size);
         if (userMapper.updateById(user) == 0) {
             throw new TransactionalException("SQL错误");
         }
-    }
-
-    @Override
-    public boolean RenameFolder(UserMode user, int folderId, String name) {
-        FolderMode folder = folderMapper.selectById(folderId);
-        if (folder == null || !folder.getOwnerId().equals(user.getId())) {
-            return false;
-        }
-        folder.setName(name);
-        folder.setUpdateTime(new Date());
-        return folderMapper.updateById(folder) != 0;
     }
 }

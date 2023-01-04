@@ -13,7 +13,7 @@ public interface FolderMapper extends BaseMapper<FolderMode> {
 
     List<FolderMode> findFolderByParentId(int folderId);
 
-    List<FolderMode> findDeleteFolderInLastTime(int userId, Date time);
+    List<FolderMode> findRecycleFolderInLastTime(int userId, Date time);
 
     FolderMode findRootFolderId(int userId);
 }

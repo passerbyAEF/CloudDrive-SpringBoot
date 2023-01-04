@@ -15,6 +15,7 @@ public class FolderMode {
     String name;
     Integer ownerId;
     Integer parentId;
+    Boolean isRecycle;
     Date createTime;
     Date updateTime;
     Date deleteTime;

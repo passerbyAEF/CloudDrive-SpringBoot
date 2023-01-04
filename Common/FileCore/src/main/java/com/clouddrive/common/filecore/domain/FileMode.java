@@ -17,6 +17,7 @@ public class FileMode {
     String hashId;
     Integer userId;
     Long storage;
+    Boolean isRecycle;
     Date createTime;
     Date updateTime;
     Date deleteTime;
