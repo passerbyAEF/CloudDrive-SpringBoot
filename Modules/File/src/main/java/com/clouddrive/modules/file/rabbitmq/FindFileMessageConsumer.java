@@ -1,4 +1,4 @@
-package com.clouddrive.modules.file.rocketmq;
+package com.clouddrive.modules.file.rabbitmq;
 
 import com.clouddrive.common.id.constant.WorkIDConstants;
 import com.clouddrive.common.id.feign.GetIDFeign;
@@ -53,7 +53,7 @@ class FindFileMessageConsumer {
         redisUtil.addStringAndSetTimeOut("downloadTask:" + downloadId, mess, 5);
 
         Map<String, String> re = new HashMap<>();
-        re.put("hashId", map.get("hash").toString());
+        re.put("hashId", map.get("hash"));
         re.put("downloadId", downloadId.toString());
         re.put("nodeId", NodeIDConstants.NodeID.toString());
         rabbitTemplate.convertAndSend(ExchangeConstant.ReturnFindFileDataExchangeName,"",re);

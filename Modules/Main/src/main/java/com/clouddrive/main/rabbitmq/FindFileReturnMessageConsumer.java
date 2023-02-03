@@ -1,4 +1,4 @@
-package com.clouddrive.main.rocketmq;
+package com.clouddrive.main.rabbitmq;
 
 import com.clouddrive.common.rabbitmq.constant.ExchangeConstant;
 import com.clouddrive.common.redis.util.RedisUtil;
