@@ -2,9 +2,12 @@ package com.clouddrive.main.service.impl;
 
 import com.clouddrive.common.core.exception.AuthException;
 import com.clouddrive.common.core.exception.SQLException;
+import com.clouddrive.common.filecore.domain.FileMode;
+import com.clouddrive.common.filecore.domain.FolderMode;
 import com.clouddrive.common.filecore.domain.ShareMode;
 import com.clouddrive.common.filecore.dto.CreateShareDTO;
 import com.clouddrive.common.filecore.dto.UploadShareDTO;
+import com.clouddrive.common.filecore.view.FileViewNode;
 import com.clouddrive.common.filecore.view.ShareViewNode;
 import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.mapper.FileMapper;
@@ -13,10 +16,9 @@ import com.clouddrive.main.mapper.ShareMapper;
 import com.clouddrive.main.service.FileShareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class FileShareServiceImpl implements FileShareService {
@@ -43,6 +45,61 @@ public class FileShareServiceImpl implements FileShareService {
             list.add(viewNode);
         }
         return list;
+    }
+
+    @Override
+    public List<FileViewNode> getFileListForShare(Integer shareId, String path) {
+        ShareMode share = shareMapper.selectById(shareId);
+        List<FileViewNode> list = new ArrayList<>();
+        if (share == null) {
+            return list;
+        }
+        if (share.getEntityType() == 0) {
+            FolderMode folder = folderMapper.selectById(share.getEntityId());
+            Queue<String> qu=new LinkedList<>();
+            for (String s : path.split("/")) {
+                qu.offer(s);
+            }
+            //弹出第一个空
+            qu.poll();
+            FolderMode targetFolder=toThePath(folder,qu);
+
+            List<FolderMode> targetFolderList = folderMapper.findFolderByParentId(targetFolder.getId());
+            List<FileMode> targetFileList = fileMapper.findFileByFolderId(targetFolder.getId());
+            for (FolderMode item : targetFolderList) {
+                list.add(new FileViewNode(item));
+            }
+            for (FileMode item : targetFileList) {
+                list.add(new FileViewNode(item));
+            }
+        } else {
+            FileMode file = fileMapper.selectById(share.getEntityId());
+            list.add(new FileViewNode(file));
+        }
+        return list;
+    }
+
+    @Override
+    public Integer getEntityId(Integer shareId) {
+        return shareMapper.selectById(shareId).getEntityId();
+    }
+
+    @Override
+    public boolean hasCipher(Integer shareId) {
+       return StringUtils.hasLength(shareMapper.selectById(shareId).getSecretKey());
+    }
+
+    FolderMode toThePath(FolderMode folder, Queue<String> path) {
+        if (!path.isEmpty()){
+            String p = path.poll();
+            List<FolderMode> list = folderMapper.findFolderByParentId(folder.getId());
+            for (FolderMode f : list) {
+                if(f.getName().equals(p)){
+                    return toThePath(f,path);
+                }
+            }
+        }
+        return folder;
     }
 
     @Override
