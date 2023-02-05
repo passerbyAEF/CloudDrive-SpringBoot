@@ -35,7 +35,9 @@ public class SecurityConfig {
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.addFilterBefore(getTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> {
-                    auth.antMatchers("/External/login", "/External/register", "/External/mailCode/**", "/System/**").permitAll()
+                    auth.antMatchers("/External/Share/Control/**").hasRole("USER")
+                            .antMatchers("/Administration/**").hasRole("ADMIN")
+                            .antMatchers("/External/login", "/External/register", "/External/mailCode/**", "/External/Share/**", "/System/**").permitAll()
                             .anyRequest().hasRole("USER");
                 }).csrf().disable();
         return http.build();

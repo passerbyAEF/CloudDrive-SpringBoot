@@ -6,6 +6,7 @@ import com.clouddrive.common.filecore.view.FileViewNode;
 import com.clouddrive.common.filecore.view.ShareViewNode;
 import com.clouddrive.common.security.domain.UserMode;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface FileShareService {
@@ -24,4 +25,5 @@ public interface FileShareService {
 
     void delete(UserMode user, Integer id);
 
+    String DownloadShareFile(int shareId,String path,String fileName) throws IOException;
 }

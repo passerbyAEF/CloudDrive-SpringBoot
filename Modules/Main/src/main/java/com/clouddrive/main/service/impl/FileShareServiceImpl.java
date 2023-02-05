@@ -9,19 +9,26 @@ import com.clouddrive.common.filecore.dto.CreateShareDTO;
 import com.clouddrive.common.filecore.dto.UploadShareDTO;
 import com.clouddrive.common.filecore.view.FileViewNode;
 import com.clouddrive.common.filecore.view.ShareViewNode;
+import com.clouddrive.common.rabbitmq.constant.ExchangeConstant;
 import com.clouddrive.common.security.domain.UserMode;
 import com.clouddrive.main.mapper.FileMapper;
 import com.clouddrive.main.mapper.FolderMapper;
 import com.clouddrive.main.mapper.ShareMapper;
+import com.clouddrive.main.service.FileLocalService;
 import com.clouddrive.main.service.FileShareService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
 public class FileShareServiceImpl implements FileShareService {
+
+    @Autowired
+    RabbitTemplate rabbitTemplate;
 
     @Autowired
     ShareMapper shareMapper;
@@ -56,13 +63,17 @@ public class FileShareServiceImpl implements FileShareService {
         }
         if (share.getEntityType() == 0) {
             FolderMode folder = folderMapper.selectById(share.getEntityId());
-            Queue<String> qu=new LinkedList<>();
+            Queue<String> qu = new LinkedList<>();
+            if (path.length() > 0 && path.charAt(0) == '/') {
+                path = path.substring(1);
+            }
+            if (path.length() > 0 && path.charAt(path.length() - 1) == '/') {
+                path.substring(0, path.length() - 1);
+            }
             for (String s : path.split("/")) {
                 qu.offer(s);
             }
-            //弹出第一个空
-            qu.poll();
-            FolderMode targetFolder=toThePath(folder,qu);
+            FolderMode targetFolder = toThePath(folder, qu);
 
             List<FolderMode> targetFolderList = folderMapper.findFolderByParentId(targetFolder.getId());
             List<FileMode> targetFileList = fileMapper.findFileByFolderId(targetFolder.getId());
@@ -86,16 +97,16 @@ public class FileShareServiceImpl implements FileShareService {
 
     @Override
     public boolean hasCipher(Integer shareId) {
-       return StringUtils.hasLength(shareMapper.selectById(shareId).getSecretKey());
+        return StringUtils.hasLength(shareMapper.selectById(shareId).getSecretKey());
     }
 
     FolderMode toThePath(FolderMode folder, Queue<String> path) {
-        if (!path.isEmpty()){
+        if (!path.isEmpty()) {
             String p = path.poll();
             List<FolderMode> list = folderMapper.findFolderByParentId(folder.getId());
             for (FolderMode f : list) {
-                if(f.getName().equals(p)){
-                    return toThePath(f,path);
+                if (f.getName().equals(p)) {
+                    return toThePath(f, path);
                 }
             }
         }
@@ -137,5 +148,44 @@ public class FileShareServiceImpl implements FileShareService {
         if (shareMapper.updateById(shareMode) == 0) {
             throw new SQLException("SQL执行错误");
         }
+    }
+
+    @Override
+    public String DownloadShareFile(int shareId, String path, String fileName) throws IOException {
+        ShareMode share = shareMapper.selectById(shareId);
+        FileMode fileMode = null;
+        if (share.getEntityType() == 0) {
+            //提取目标路径的文件夹id
+            FolderMode folder = folderMapper.selectById(share.getEntityId());
+            Queue<String> qu = new LinkedList<>();
+            if (path.length() > 0 && path.charAt(0) == '/') {
+                path = path.substring(1);
+            }
+            if (path.length() > 0 && path.charAt(path.length() - 1) == '/') {
+                path.substring(0, path.length() - 1);
+            }
+            for (String s : path.split("/")) {
+                qu.offer(s);
+            }
+            FolderMode targetFolder = toThePath(folder, qu);
+
+            List<FileMode> fileList = fileMapper.findFileByFolderId(targetFolder.getId());
+            for (FileMode item : fileList) {
+                if (item.getName().equals(fileName)) {
+                    fileMode = item;
+                    break;
+                }
+            }
+        } else {
+            fileMode = fileMapper.selectById(share.getEntityId());
+        }
+
+        if (fileMode == null)
+            throw new IOException("文件不存在");
+        String flag = fileMode.getHashId();
+        Map<String, String> data = new HashMap<>();
+        data.put("hash", fileMode.getHashId());
+        rabbitTemplate.convertAndSend(ExchangeConstant.FindFileExchangeName, ExchangeConstant.ReturnFindFileDataQueueName, data);
+        return flag;
     }
 }
