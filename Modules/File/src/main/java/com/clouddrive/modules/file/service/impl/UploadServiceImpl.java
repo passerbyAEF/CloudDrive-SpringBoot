@@ -55,9 +55,10 @@ public class UploadServiceImpl implements UploadService {
         String sizeStr = map.get("size").toString();
         String fileBufferSavePath = Paths.get(fileBufferPath, hashStr + "_" + sizeStr).toString();
 
+        byte[] bytes = file.getBytes();
         RandomAccessFile randomAccessFile = new RandomAccessFile(fileBufferSavePath, "rw");
         randomAccessFile.seek(partSize * partId);
-        randomAccessFile.write(file.getBytes());
+        randomAccessFile.write(bytes);
         randomAccessFile.close();
 
         List<String> strList = (List<String>) map.get("wrote");
@@ -71,7 +72,7 @@ public class UploadServiceImpl implements UploadService {
         }
         rangeList.sort((x, y) -> (int) (x.getStart() - y.getStart()));
 
-        rangeList = EditWaitList(partSize * partId, partSize * partId + file.getSize(), rangeList);
+        rangeList = EditWaitList(partSize * partId, partSize * partId + bytes.length, rangeList);
 
         //如果已经全部输入完毕
         if (rangeList.size() == 1 && rangeList.get(0).getStart() == 0 && rangeList.get(0).getEnd() == Long.parseLong(map.get("size").toString())) {
@@ -118,7 +119,7 @@ public class UploadServiceImpl implements UploadService {
             stringBuilder.append('\"');
             stringBuilder.append(range.getStart());
             stringBuilder.append('-');
-            stringBuilder.append(range.getStart());
+            stringBuilder.append(range.getEnd());
             stringBuilder.append('\"');
             stringBuilder.append(',');
         }
@@ -135,6 +136,7 @@ public class UploadServiceImpl implements UploadService {
     public void removeTask(String uploadId) throws JsonProcessingException {
         //删除文件并清除redis记录
         String uploadData = redisUtil.getString(uploadId);
+        if(uploadData==null) return;
         Map<String, Object> map = objectMapper.readValue(uploadData, new TypeReference<Map>() {
         });
         String hashStr = map.get("hash").toString();
@@ -194,7 +196,7 @@ public class UploadServiceImpl implements UploadService {
         range.setStart(start);
         range.setEnd(end);
         waitList.add(range);
-        waitList.sort((x, y) -> (int) (x.getStart() - y.getStart()));
+        waitList.sort((x, y) -> (int) (x.getEnd() - y.getStart()));
         for (int i = 0; i < waitList.size() - 1; i++) {
             if (waitList.get(i).getEnd() >= waitList.get(i + 1).getStart()) {
                 Range l = waitList.get(i);
