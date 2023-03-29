@@ -27,8 +27,11 @@ public class ShareController extends BaseController {
 
     @GetMapping("List")
     ReturnMode<Object> list(HttpServletResponse response, Integer id, @RequestParam(defaultValue = "/") String path, @RequestParam(required = false) String secretKey) {
-        if (!StringUtils.hasLength(secretKey) && !fileShareService.hasCipher(id)) {
+        if (!StringUtils.hasLength(secretKey) && fileShareService.hasCipher(id)) {
             return setDataAndReturn(null, "请认证！", HttpStatus.UNAUTHORIZED);
+        }
+        if(fileShareService.isOutdated(id)){
+            return setDataAndReturn(null, "已经过期！", HttpStatus.CONFLICT);
         }
         return OK(fileShareService.getFileListForShare(id, path));
     }

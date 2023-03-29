@@ -188,4 +188,11 @@ public class FileShareServiceImpl implements FileShareService {
         rabbitTemplate.convertAndSend(ExchangeConstant.FindFileExchangeName, ExchangeConstant.ReturnFindFileDataQueueName, data);
         return flag;
     }
+
+    @Override
+    public boolean isOutdated(Integer id) {
+        ShareMode mode = shareMapper.selectById(id);
+        Date now =new Date();
+        return (mode.getDeleteTime()!=null&&mode.getDeleteTime().before(now)) || (mode.getOverdueTime()!=null&&mode.getOverdueTime().before(now));
+    }
 }

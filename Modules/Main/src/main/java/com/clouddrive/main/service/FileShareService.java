@@ -26,4 +26,6 @@ public interface FileShareService {
     void delete(UserMode user, Integer id);
 
     String DownloadShareFile(int shareId,String path,String fileName) throws IOException;
+
+    boolean isOutdated(Integer id);
 }

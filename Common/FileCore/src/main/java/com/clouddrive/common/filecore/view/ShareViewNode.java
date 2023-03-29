@@ -16,6 +16,7 @@ public class ShareViewNode {
         this.id = share.getId();
         this.entityId = share.getEntityId();
         this.entityType = share.getEntityType();
+        this.secretKey=share.getSecretKey();
         this.isUseCipher = StringUtils.hasLength(share.getSecretKey());
         this.isUseOverdue = share.getOverdueTime() != null;
         this.overdueTime = share.getOverdueTime();
@@ -25,6 +26,7 @@ public class ShareViewNode {
     Integer id;
     Integer sharer;
     Integer entityId;
+    String secretKey;
     //1为文件，0为文件夹
     Integer entityType;
     Boolean isUseCipher;
