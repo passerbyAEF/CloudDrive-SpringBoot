@@ -4,7 +4,6 @@ package com.clouddrive.main.controller;
 import com.clouddrive.common.core.constant.HttpStatus;
 import com.clouddrive.common.core.controller.BaseController;
 import com.clouddrive.common.core.domain.ReturnMode;
-import com.clouddrive.common.security.util.UserUtil;
 import com.clouddrive.main.service.FileShareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,18 +26,26 @@ public class ShareController extends BaseController {
 
     @GetMapping("List")
     ReturnMode<Object> list(HttpServletResponse response, Integer id, @RequestParam(defaultValue = "/") String path, @RequestParam(required = false) String secretKey) {
-        if (!StringUtils.hasLength(secretKey) && fileShareService.hasCipher(id)) {
-            return setDataAndReturn(null, "请认证！", HttpStatus.UNAUTHORIZED);
-        }
-        if(fileShareService.isOutdated(id)){
+        try {
+            if (fileShareService.isOutdated(id)) {
+                return setDataAndReturn(null, "已经过期！", HttpStatus.CONFLICT);
+            }
+            if (!StringUtils.hasLength(secretKey) && fileShareService.hasCipher(id)) {
+                return setDataAndReturn(null, "请认证！", HttpStatus.UNAUTHORIZED);
+            }
+            return OK(fileShareService.getFileListForShare(id, path));
+        } catch (NullPointerException e) {
             return setDataAndReturn(null, "已经过期！", HttpStatus.CONFLICT);
         }
-        return OK(fileShareService.getFileListForShare(id, path));
     }
 
     @GetMapping("getEntityId")
     ReturnMode<Object> getEntityId(HttpServletResponse response, Integer id) {
-        return OK(fileShareService.getEntityId(id));
+        try {
+            return OK(fileShareService.getEntityId(id));
+        } catch (NullPointerException e) {
+            return setDataAndReturn(null, "已经过期！", HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("Download")
@@ -47,7 +54,7 @@ public class ShareController extends BaseController {
             return setDataAndReturn(null, "请认证！", HttpStatus.UNAUTHORIZED);
         }
         try {
-            return OK(fileShareService.DownloadShareFile(id,path,fileName));
+            return OK(fileShareService.DownloadShareFile(id, path, fileName));
         } catch (IOException e) {
             return Error(e.getMessage());
         }

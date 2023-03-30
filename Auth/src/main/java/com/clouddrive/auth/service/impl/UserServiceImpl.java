@@ -9,6 +9,8 @@ import com.clouddrive.common.core.exception.TransactionalException;
 import com.clouddrive.common.filecore.domain.FolderMode;
 import com.clouddrive.common.security.domain.UserMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +24,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserMode> implement
     @Autowired
     FolderMapper folderMapper;
 
+
+
     @Override
     public UserMode getUserByEmail(String s) {
         return userMapper.selectOne(new QueryWrapper<UserMode>().eq("email", s));
     }
 
+
+    @Override
+    public Boolean isAdmin(UserMode user) {
+        SimpleAuthorityMapper s=new SimpleAuthorityMapper();
+        for (GrantedAuthority authority : user.getAuthorities()) {
+            if(authority.getAuthority().equals("ROLE_ADMIN")){
+               return true;
+            }
+        }
+        return false;
+    }
 
     @Transactional
     @Override
